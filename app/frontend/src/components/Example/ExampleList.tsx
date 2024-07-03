@@ -3,9 +3,9 @@ import { Example } from "./Example";
 import styles from "./Example.module.css";
 
 const DEFAULT_EXAMPLES: string[] = [
-    "What is included in my Northwind Health Plus plan that is not in standard?",
-    "What happens in a performance review?",
-    "What does a Product Manager do?"
+    "What are the genetic causes of thalassaemia, and how do they affect the severity of the disease?",
+    "At what age do symptoms of thalassaemia typically present, and what are the common complications associated with it?" ,
+    "How does thalassaemia impact employment, and what are some common challenges faced by adults with this condition in the workplace?"
 ];
 
 const GPT4V_EXAMPLES: string[] = [

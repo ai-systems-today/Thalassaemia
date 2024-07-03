@@ -14,11 +14,11 @@ const Layout = () => {
             <header className={styles.header} role={"banner"}>
                 <div className={styles.headerContainer}>
                     <Link to="/" className={styles.headerTitleContainer}>
-                        <h3 className={styles.headerTitle}>GPT + Enterprise data | Sample</h3>
+                        <h3 className={styles.headerTitle}>Thalassaemia International Federation</h3>
                     </Link>
                     <nav>
                         <ul className={styles.headerNavList}>
-                            <li>
+                            {/* <li>
                                 <NavLink to="/" className={({ isActive }) => (isActive ? styles.headerNavPageLinkActive : styles.headerNavPageLink)}>
                                     Chat
                                 </NavLink>
@@ -39,10 +39,10 @@ const Layout = () => {
                                         className={styles.githubLogo}
                                     />
                                 </a>
-                            </li>
+                            </li> */}
                         </ul>
                     </nav>
-                    <h4 className={styles.headerRightText}>Azure OpenAI + AI Search</h4>
+                    <h4 className={styles.headerRightText}></h4>
                     {useLogin && <LoginButton />}
                 </div>
             </header>
