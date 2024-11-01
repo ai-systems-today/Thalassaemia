@@ -5,7 +5,7 @@ import styles from "./AnalysisPanel.module.css";
 import { SupportingContent } from "../SupportingContent";
 import { ChatAppResponse } from "../../api";
 import { AnalysisPanelTabs } from "./AnalysisPanelTabs";
-import { ThoughtProcess } from "./ThoughtProcess";
+//import { ThoughtProcess } from "./ThoughtProcess";
 import { MarkdownViewer } from "../MarkdownViewer";
 import { useMsal } from "@azure/msal-react";
 import { getHeaders } from "../../api";
@@ -76,13 +76,13 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, citationHeigh
             selectedKey={activeTab}
             onLinkClick={pivotItem => pivotItem && onActiveTabChanged(pivotItem.props.itemKey! as AnalysisPanelTabs)}
         >
-            <PivotItem
+            {/*<PivotItem
                 itemKey={AnalysisPanelTabs.ThoughtProcessTab}
                 headerText="Thought process"
                 headerButtonProps={isDisabledThoughtProcessTab ? pivotItemDisabledStyle : undefined}
             >
                 <ThoughtProcess thoughts={answer.context.thoughts || []} />
-            </PivotItem>
+            </PivotItem>*/}
             <PivotItem
                 itemKey={AnalysisPanelTabs.SupportingContentTab}
                 headerText="Supporting content"
