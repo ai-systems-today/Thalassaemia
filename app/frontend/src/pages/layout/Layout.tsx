@@ -2,6 +2,8 @@ import { Outlet, NavLink, Link } from "react-router-dom";
 
 import github from "../../assets/github.svg";
 
+import tifDropIcon from "../../public/favicon.ico";
+
 import styles from "./Layout.module.css";
 
 import { useLogin } from "../../authConfig";
@@ -14,7 +16,9 @@ const Layout = () => {
             <header className={styles.header} role={"banner"}>
                 <div className={styles.headerContainer}>
                     <Link to="/" className={styles.headerTitleContainer}>
-                        <h3 className={styles.headerTitle}>Thalassaemia International Federation</h3>
+                        <h3 className={styles.headerTitle}>
+                            <img src={tifDropIcon} alt="TIF Logo" className={styles.headerIcon}/>
+                        Thalassaemia International Federation</h3>
                     </Link>
                     <nav>
                         <ul className={styles.headerNavList}>

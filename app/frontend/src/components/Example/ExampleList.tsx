@@ -19,14 +19,35 @@ interface Props {
     useGPT4V?: boolean;
 }
 
+// export const ExampleList = ({ onExampleClicked, useGPT4V }: Props) => {
+//     return (
+//         <ul className={styles.examplesNavList}>
+//             {(useGPT4V ? GPT4V_EXAMPLES : DEFAULT_EXAMPLES).map((question, i) => (
+//                 <li key={i}>
+//                     <Example text={question} value={question} onClick={onExampleClicked} />
+//                 </li>
+//             ))}
+//         </ul>
+//     );
+// };
 export const ExampleList = ({ onExampleClicked, useGPT4V }: Props) => {
     return (
-        <ul className={styles.examplesNavList}>
-            {(useGPT4V ? GPT4V_EXAMPLES : DEFAULT_EXAMPLES).map((question, i) => (
-                <li key={i}>
-                    <Example text={question} value={question} onClick={onExampleClicked} />
-                </li>
-            ))}
-        </ul>
+        <div>
+            <ul className={styles.examplesNavList}>
+                {(useGPT4V ? GPT4V_EXAMPLES : DEFAULT_EXAMPLES).map((question, i) => (
+                    <li key={i}>
+                        <Example text={question} value={question} onClick={onExampleClicked} />
+                    </li>
+                ))}
+            </ul>
+            
+            {/* Add Disclaimer Here */}
+            <p className={styles.disclaimer}>
+                Disclaimer: This information has been obtained from TIF International Guidelines, which were developed 
+                by renowned international experts in the field of haemoglobinopathies. 
+                <a href="https://thalassaemia.org.cy/haemoglobin-disorders/clinical-trial-updates/" target="_blank" rel="noopener noreferrer"> Please visit our website</a> 
+                for bi-monthly updates on new advances and clinical trials.
+            </p>
+        </div>
     );
 };

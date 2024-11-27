@@ -76,3 +76,10 @@
 .githubLogo {
     height: 20px;
 }
+
+.headerIcon {
+    width: 32px; /* Adjust size to your preference */
+    height: 32px;
+    margin-right: 10px; /* Space between icon and text */
+    vertical-align: middle;
+}
