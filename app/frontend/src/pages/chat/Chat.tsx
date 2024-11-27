@@ -343,8 +343,8 @@ const Chat = () => {
                         <div className={styles.chatEmptyState}>
                             {/* <SparkleFilled fontSize={"120px"} primaryFill={"rgba(115, 118, 225, 1)"} aria-hidden="true" aria-label="Chat logo" />*/}
                             <div className={styles.logoRow}>
-                                <img src="/thalia-logo.png" alt="Thalia Logo" className={styles.logoImage} />
-                                <img src="/eu-cofounded.jpg" alt="EU Cofounded Logo" className={styles.logoImage} />
+                                <img src="./thalia-logo.png" alt="Thalia Logo" className={styles.logoImage} />
+                                <img src="./eu-cofounded.jpg" alt="EU Cofounded Logo" className={styles.logoImage} />
                             </div>
                             <div className={styles.disclaimer}>
                                 Disclaimer: Funded by the European Union. However, the views and opinions expressed are those of the author(s) only and do not reflect
