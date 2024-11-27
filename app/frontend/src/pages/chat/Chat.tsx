@@ -3,6 +3,8 @@ import { Checkbox, Panel, DefaultButton, TextField, ITextFieldProps, ICheckboxPr
 import { SparkleFilled } from "@fluentui/react-icons";
 import { useId } from "@fluentui/react-hooks";
 import readNDJSONStream from "ndjson-readablestream";
+import thaliaIcon from "./thalia-logo.png";
+import euIcon from "./eu-cofounded.jpg";
 
 import styles from "./Chat.module.css";
 
@@ -343,8 +345,8 @@ const Chat = () => {
                         <div className={styles.chatEmptyState}>
                             {/* <SparkleFilled fontSize={"120px"} primaryFill={"rgba(115, 118, 225, 1)"} aria-hidden="true" aria-label="Chat logo" />*/}
                             <div className={styles.logoRow}>
-                                <img src="/thalia-logo.png" alt="Thalia Logo" className={styles.logoImage} />
-                                <img src="/eu-cofounded.jpg" alt="EU Cofounded Logo" className={styles.logoImage} />
+                                <img src={thaliaIcon} alt="Thalia Logo" className={styles.logoImage} />
+                                <img src={euIcon} alt="EU Cofounded Logo" className={styles.logoImage} />
                             </div>
                             <div className={styles.disclaimer}>
                                 <b>Disclaimer:</b> Funded by the European Union. However, the views and opinions expressed are those of the author(s) only and do not reflect
