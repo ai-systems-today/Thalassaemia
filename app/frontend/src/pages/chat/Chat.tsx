@@ -341,7 +341,15 @@ const Chat = () => {
                 <div className={styles.chatContainer}>
                     {!lastQuestionRef.current ? (
                         <div className={styles.chatEmptyState}>
-                            <SparkleFilled fontSize={"120px"} primaryFill={"rgba(115, 118, 225, 1)"} aria-hidden="true" aria-label="Chat logo" />
+                            {/* <SparkleFilled fontSize={"120px"} primaryFill={"rgba(115, 118, 225, 1)"} aria-hidden="true" aria-label="Chat logo" />*/}
+                            <div className={styles.logoRow}>
+                                <img src="/thalia-logo.png" alt="Thalia Logo" className={styles.logoImage} />
+                                <img src="/eu-cofounded.jpg" alt="EU Cofounded Logo" className={styles.logoImage} />
+                            </div>
+                            <div className={styles.disclaimer}>
+                                Disclaimer: Funded by the European Union. However, the views and opinions expressed are those of the author(s) only and do not reflect
+                                those of the European Union or HaDEA. Neither the European Union nor the granting authority can be held responsible for them.
+                            </div>
                             <h1 className={styles.chatEmptyStateTitle}>Let's Talk About Thalassaemia</h1>
                             <h2 className={styles.chatEmptyStateSubtitle}>Ask your question or try an example below</h2>
                             <ExampleList onExampleClicked={onExampleClicked} useGPT4V={useGPT4V} />

@@ -83,3 +83,26 @@
     margin-right: 10px; /* Space between icon and text */
     vertical-align: middle;
 }
+
+.logoRow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px; /* Space between the logos */
+    margin-bottom: 20px; /* Space below the logos */
+}
+
+.logoImage {
+    height: 50px; /* Adjust as needed */
+    object-fit: contain; /* Ensures the image scales nicely */
+}
+
+.disclaimer {
+    text-align: center;
+    font-size: 14px;
+    color: #666; /* A neutral gray for the disclaimer text */
+    margin-top: 10px; /* Space above the disclaimer */
+    max-width: 80%; /* Ensure it's not too wide */
+    margin-left: auto;
+    margin-right: auto; /* Center the disclaimer text */
+}
