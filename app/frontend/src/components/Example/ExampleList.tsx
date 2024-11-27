@@ -3,9 +3,9 @@ import { Example } from "./Example";
 import styles from "./Example.module.css";
 
 const DEFAULT_EXAMPLES: string[] = [
-    "What are the genetic causes of thalassaemia, and how do they affect the severity of the disease?",
-    "At what age do symptoms of thalassaemia typically present, and what are the common complications associated with it?" ,
-    "How does thalassaemia impact employment, and what are some common challenges faced by adults with this condition in the workplace?"
+    "What are the genetic causes of thalassaemia and their impact on severity?",
+    "When do thalassaemia symptoms appear, and what are common complications?" ,
+    "How does thalassaemia affect employment and workplace challenges for adults?"
 ];
 
 const GPT4V_EXAMPLES: string[] = [
