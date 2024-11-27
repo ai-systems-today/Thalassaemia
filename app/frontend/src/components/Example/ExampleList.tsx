@@ -43,10 +43,7 @@ export const ExampleList = ({ onExampleClicked, useGPT4V }: Props) => {
             
             {/* Add Disclaimer Here */}
             <p className={styles.disclaimer}>
-                Disclaimer: This information has been obtained from TIF International Guidelines, which were developed 
-                by renowned international experts in the field of haemoglobinopathies. 
-                <a href="https://thalassaemia.org.cy/haemoglobin-disorders/clinical-trial-updates/" target="_blank" rel="noopener noreferrer"> Please visit our website</a> 
-                for bi-monthly updates on new advances and clinical trials.
+                <b>Disclaimer:</b>This information has been obtained from TIF International Guidelines, which were developed by renowned international experts in the field of haemoglobinopathies.  Please visit our <a href="https://thalassaemia.org.cy/haemoglobin-disorders/clinical-trial-updates/" target="_blank" rel="noopener noreferrer"> website</a> for bi-monthly updates on new advances and clinical trials.
             </p>
         </div>
     );

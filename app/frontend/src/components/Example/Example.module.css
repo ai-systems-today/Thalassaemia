@@ -39,19 +39,23 @@
         height: 80px;
     }
 }
+
 .disclaimer {
-    margin-top: 20px; /* Adds spacing between the conversation starters and disclaimer */
-    font-size: 14px; /* Smaller text size */
-    color: #666; /* Neutral gray color */
-    text-align: center; /* Center aligns the text */
-    line-height: 1.5; /* Better readability */
+    margin-top: 20px; /* Add space between the conversation starters and disclaimer */
+    font-size: 14px; /* Adjust text size */
+    color: #666; /* Neutral gray text color */
+    text-align: center; /* Center align text */
+    line-height: 1.5; /* Improve readability */
+    max-width: 600px; /* Set a maximum width to match other elements */
+    margin-left: auto; /* Center align horizontally */
+    margin-right: auto; /* Center align horizontally */
 }
 
 .disclaimer a {
     color: #0078d4; /* Blue color for the hyperlink */
-    text-decoration: none; /* Removes underline from the link */
+    text-decoration: none; /* Remove underline */
 }
 
 .disclaimer a:hover {
-    text-decoration: underline; /* Underline on hover for accessibility */
+    text-decoration: underline; /* Add underline on hover for accessibility */
 }
