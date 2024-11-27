@@ -39,3 +39,19 @@
         height: 80px;
     }
 }
+.disclaimer {
+    margin-top: 20px; /* Adds spacing between the conversation starters and disclaimer */
+    font-size: 14px; /* Smaller text size */
+    color: #666; /* Neutral gray color */
+    text-align: center; /* Center aligns the text */
+    line-height: 1.5; /* Better readability */
+}
+
+.disclaimer a {
+    color: #0078d4; /* Blue color for the hyperlink */
+    text-decoration: none; /* Removes underline from the link */
+}
+
+.disclaimer a:hover {
+    text-decoration: underline; /* Underline on hover for accessibility */
+}
