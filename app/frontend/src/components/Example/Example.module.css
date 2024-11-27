@@ -46,7 +46,7 @@
     color: #666; /* Neutral gray text color */
     text-align: center; /* Center align text */
     line-height: 1.5; /* Improve readability */
-    max-width: 800px; /* Set a maximum width to match other elements */
+    max-width: 900px; /* Set a maximum width to match other elements */
     margin-left: auto; /* Center align horizontally */
     margin-right: auto; /* Center align horizontally */
 }
