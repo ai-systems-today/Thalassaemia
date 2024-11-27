@@ -2,7 +2,7 @@ import { Outlet, NavLink, Link } from "react-router-dom";
 
 import github from "../../assets/github.svg";
 
-import tifDropIcon from "../../public/favicon.ico";
+import tifDropIcon from "./favicon.ico";
 
 import styles from "./Layout.module.css";
 
