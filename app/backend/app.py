@@ -429,6 +429,7 @@ async def setup_clients():
     # Replace these with your own values, either in environment variables or directly here
     AZURE_STORAGE_ACCOUNT = os.environ["AZURE_STORAGE_ACCOUNT"]
     AZURE_STORAGE_CONTAINER = os.environ["AZURE_STORAGE_CONTAINER"]
+    AZURE_STORAGE_CHATLOGS = os.environ["AZURE_STORAGE_CHATLOGS"]
     AZURE_USERSTORAGE_ACCOUNT = os.environ.get("AZURE_USERSTORAGE_ACCOUNT")
     AZURE_USERSTORAGE_CONTAINER = os.environ.get("AZURE_USERSTORAGE_CONTAINER")
     AZURE_SEARCH_SERVICE = os.environ["AZURE_SEARCH_SERVICE"]
@@ -496,6 +497,10 @@ async def setup_clients():
         f"https://{AZURE_STORAGE_ACCOUNT}.blob.core.windows.net", AZURE_STORAGE_CONTAINER, credential=azure_credential
     )
 
+    # Add this for the chatlogs container
+    chatlogs_container_client = ContainerClient(
+        f"https://{AZURE_STORAGE_ACCOUNT}.blob.core.windows.net", "AZURE_STORAGE_CHATLOGS", credential=azure_credential
+    )
     # Set up authentication helper
     search_index = None
     if AZURE_USE_AUTHENTICATION:
@@ -604,6 +609,7 @@ async def setup_clients():
         )
 
     current_app.config[CONFIG_OPENAI_CLIENT] = openai_client
+    current_app.config["AZURE_STORAGE_CHATLOGS"] = chatlogs_container_client
     current_app.config[CONFIG_SEARCH_CLIENT] = search_client
     current_app.config[CONFIG_BLOB_CONTAINER_CLIENT] = blob_container_client
     current_app.config[CONFIG_AUTH_CLIENT] = auth_helper
