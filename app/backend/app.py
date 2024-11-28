@@ -181,6 +181,52 @@ async def ask(auth_claims: Dict[str, Any]):
         return error_response(error, "/ask")
 
 
+import uuid
+from datetime import datetime
+# from quart import request  # Ensure you include this import
+
+# THIS IS THE SAVE API REQUESTS FOR QUESTIONS AND ANSWER
+@bp.post("/save-chat")
+async def save_chat():
+    try:
+        # Parse request data
+        request_json = await request.get_json()
+        chat_id = str(uuid.uuid4())  # Generate a UUID for chatId
+        user_ip = request.headers.get("X-Forwarded-For", request.remote_addr)  # Capture user IP
+        messages = request_json.get("messages", [])
+        timestamp = datetime.now(datetime.timezone.utc).isoformat() + "Z"  # Current timestamp in ISO 8601
+
+        # Format chat data
+        chat_data = {
+            "chatId": chat_id,
+            "timestamp": timestamp,
+            "userIp": user_ip,
+            "conversation": [
+                {
+                    "question": msg["user"],
+                    "questionTimestamp": msg.get("questionTimestamp", datetime.now(datetime.timezone.utc).isoformat() + "Z"),
+                    "answer": msg["assistant"],
+                    "answerTimestamp": msg.get("answerTimestamp", datetime.now(datetime.timezone.utc).isoformat() + "Z"),
+                }
+                for msg in messages
+            ],
+        }
+        chat_json = json.dumps(chat_data, indent=2)
+
+        # Save as chatId-timestamp.json
+        filename = f"{chat_id}-{timestamp}.json"
+
+        # Save to chatlogs container
+        chatlogs_container_client: ContainerClient = current_app.config["AZURE_STORAGE_CHATLOGS"]
+        blob_client = chatlogs_container_client.get_blob_client(filename)
+        await blob_client.upload_blob(chat_json, overwrite=True)
+
+        return jsonify({"message": "Chat saved successfully", "filename": filename}), 200
+    except Exception as e:
+        logging.error("Error saving chat log", exc_info=e)
+        return jsonify({"error": "Failed to save chat log"}), 500
+
+
 class JSONEncoder(json.JSONEncoder):
     def default(self, o):
         if dataclasses.is_dataclass(o):

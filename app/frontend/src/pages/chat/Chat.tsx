@@ -189,12 +189,16 @@ const Chat = () => {
             if (shouldStream) {
                 const parsedResponse: ChatAppResponse = await handleAsyncRequest(question, answers, response.body);
                 setAnswers([...answers, [question, parsedResponse]]);
+                // Save the chat after the streamed response
+                await saveChat();
             } else {
                 const parsedResponse: ChatAppResponseOrError = await response.json();
                 if (response.status > 299 || !response.ok) {
                     throw Error(parsedResponse.error || "Unknown error");
                 }
                 setAnswers([...answers, [question, parsedResponse as ChatAppResponse]]);
+                // Save the chat after the streamed response
+                await saveChat();
             }
         } catch (e) {
             setError(e);
@@ -202,6 +206,46 @@ const Chat = () => {
             setIsLoading(false);
         }
     };
+
+
+    // Get question and answer
+    const saveChat = async () => {
+        try {
+            if (answers.length === 0) {
+                console.warn("No chat data to save!");
+                return;
+            }
+    
+            // Generate messages array
+            const messages = answers.map(([user, response]) => ({
+                user, // User question
+                assistant: response.message.content, // Assistant's answer
+                questionTimestamp: new Date().toISOString(), // Timestamp for the question
+                answerTimestamp: new Date().toISOString(), // Timestamp for the answer
+            }));
+    
+            // Send the chat messages to the backend
+            const response = await fetch(`${process.env.BACKEND_URI}/save-chat`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ messages }),
+            });
+    
+            if (!response.ok) {
+                throw new Error(`Failed to save chat: ${response.statusText}`);
+            }
+    
+            const result = await response.json();
+            console.log(`Chat saved successfully: ${result.filename}`);
+        } catch (error) {
+            console.error("Error saving chat:", error);
+        }
+    };
+    
+
+
 
     const clearChat = () => {
         lastQuestionRef.current = "";
