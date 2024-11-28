@@ -499,7 +499,7 @@ async def setup_clients():
 
     # Add this for the chatlogs container
     chatlogs_container_client = ContainerClient(
-        f"https://{AZURE_STORAGE_ACCOUNT}.blob.core.windows.net", "AZURE_STORAGE_CHATLOGS", credential=azure_credential
+        f"https://{AZURE_STORAGE_ACCOUNT}.blob.core.windows.net", AZURE_STORAGE_CHATLOGS, credential=azure_credential
     )
     # Set up authentication helper
     search_index = None
