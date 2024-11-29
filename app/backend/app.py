@@ -248,7 +248,20 @@ async def save_chat():
         logging.error("Error saving chat log", exc_info=e)
         return jsonify({"error": "Failed to save chat log", "details": str(e)}), 500
 
+class JSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        if dataclasses.is_dataclass(o):
+            return dataclasses.asdict(o)
+        return super().default(o)
 
+
+async def format_as_ndjson(r: AsyncGenerator[dict, None]) -> AsyncGenerator[str, None]:
+    try:
+        async for event in r:
+            yield json.dumps(event, ensure_ascii=False, cls=JSONEncoder) + "\n"
+    except Exception as error:
+        logging.exception("Exception while generating response stream: %s", error)
+        yield json.dumps(error_dict(error))
 
 @bp.route("/chat", methods=["POST"])
 @authenticated
