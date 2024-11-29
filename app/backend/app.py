@@ -8,6 +8,18 @@ import time
 from pathlib import Path
 from typing import Any, AsyncGenerator, Dict, Union, cast
 
+from dotenv import load_dotenv
+
+# load_dotenv()
+
+# # Access environment variables
+# AZURE_STORAGE_ACCOUNT = os.getenv("AZURE_STORAGE_ACCOUNT")
+# AZURE_STORAGE_CHATLOGS = os.getenv("AZURE_STORAGE_CHATLOGS")
+
+# # Log the loaded variables for debugging
+# logging.info(f"Storage account: {AZURE_STORAGE_ACCOUNT}")
+# logging.info(f"Chatlogs container: {AZURE_STORAGE_CHATLOGS}")
+
 from azure.cognitiveservices.speech import (
     ResultReason,
     SpeechConfig,
@@ -191,10 +203,15 @@ async def save_chat():
     try:
         # Parse request data
         request_json = await request.get_json()
+        logging.info(f"Received request data: {request_json}")
+        
         chat_id = str(uuid.uuid4())  # Generate a UUID for chatId
         user_ip = request.headers.get("X-Forwarded-For", request.remote_addr)  # Capture user IP
+        logging.info(f"Generated chat_id: {chat_id}, User IP: {user_ip}")
+
         messages = request_json.get("messages", [])
         timestamp = datetime.now(datetime.timezone.utc).isoformat() + "Z"  # Current timestamp in ISO 8601
+        logging.info(f"Messages: {messages}, Timestamp: {timestamp}")
 
         # Format chat data
         chat_data = {
@@ -212,35 +229,25 @@ async def save_chat():
             ],
         }
         chat_json = json.dumps(chat_data, indent=2)
+        logging.info(f"Chat JSON: {chat_json}")
 
         # Save as chatId-timestamp.json
         filename = f"{chat_id}-{timestamp}.json"
+        logging.info(f"Filename to save: {filename}")
 
         # Save to chatlogs container
         chatlogs_container_client: ContainerClient = current_app.config["AZURE_STORAGE_CHATLOGS"]
+        logging.info(f"Chatlogs container client initialized: {chatlogs_container_client}")
+
         blob_client = chatlogs_container_client.get_blob_client(filename)
         await blob_client.upload_blob(chat_json, overwrite=True)
+        logging.info("Chat log successfully saved.")
 
         return jsonify({"message": "Chat saved successfully", "filename": filename}), 200
     except Exception as e:
         logging.error("Error saving chat log", exc_info=e)
-        return jsonify({"error": "Failed to save chat log"}), 500
+        return jsonify({"error": "Failed to save chat log", "details": str(e)}), 500
 
-
-class JSONEncoder(json.JSONEncoder):
-    def default(self, o):
-        if dataclasses.is_dataclass(o):
-            return dataclasses.asdict(o)
-        return super().default(o)
-
-
-async def format_as_ndjson(r: AsyncGenerator[dict, None]) -> AsyncGenerator[str, None]:
-    try:
-        async for event in r:
-            yield json.dumps(event, ensure_ascii=False, cls=JSONEncoder) + "\n"
-    except Exception as error:
-        logging.exception("Exception while generating response stream: %s", error)
-        yield json.dumps(error_dict(error))
 
 
 @bp.route("/chat", methods=["POST"])
@@ -707,10 +714,54 @@ async def close_clients():
         await current_app.config[CONFIG_USER_BLOB_CONTAINER_CLIENT].close()
 
 
+# def create_app():
+#     app = Quart(__name__)
+#     app.register_blueprint(bp)
+
+#     if os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING"):
+#         configure_azure_monitor()
+#         # This tracks HTTP requests made by aiohttp:
+#         AioHttpClientInstrumentor().instrument()
+#         # This tracks HTTP requests made by httpx:
+#         HTTPXClientInstrumentor().instrument()
+#         # This tracks OpenAI SDK requests:
+#         OpenAIInstrumentor().instrument()
+#         # This middleware tracks app route requests:
+#         app.asgi_app = OpenTelemetryMiddleware(app.asgi_app)  # type: ignore[assignment]
+
+#     # Level should be one of https://docs.python.org/3/library/logging.html#logging-levels
+#     default_level = "INFO"  # In development, log more verbosely
+#     if os.getenv("WEBSITE_HOSTNAME"):  # In production, don't log as heavily
+#         default_level = "WARNING"
+#     logging.basicConfig(level=os.getenv("APP_LOG_LEVEL", default_level))
+
+#     if allowed_origin := os.getenv("ALLOWED_ORIGIN"):
+#         app.logger.info("CORS enabled for %s", allowed_origin)
+#         cors(app, allow_origin=allowed_origin, allow_methods=["GET", "POST"])
+#     return app
+
+
+# from dotenv import load_dotenv
+# import os
+# import logging
+
 def create_app():
+    # Load environment variables
+    load_dotenv()  # Ensure this is at the very top of the function
+    AZURE_STORAGE_ACCOUNT = os.getenv("AZURE_STORAGE_ACCOUNT")
+    AZURE_STORAGE_CHATLOGS = os.getenv("AZURE_STORAGE_CHATLOGS")
+
+    # Log loaded environment variables for debugging
+    logging.info(f"Storage account: {AZURE_STORAGE_ACCOUNT}")
+    logging.info(f"Chatlogs container: {AZURE_STORAGE_CHATLOGS}")
+
+    # Create Azure credential for authentication
+    azure_credential = DefaultAzureCredential()
+
     app = Quart(__name__)
     app.register_blueprint(bp)
 
+    # Azure Monitor and telemetry setup
     if os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING"):
         configure_azure_monitor()
         # This tracks HTTP requests made by aiohttp:
@@ -722,13 +773,24 @@ def create_app():
         # This middleware tracks app route requests:
         app.asgi_app = OpenTelemetryMiddleware(app.asgi_app)  # type: ignore[assignment]
 
-    # Level should be one of https://docs.python.org/3/library/logging.html#logging-levels
-    default_level = "INFO"  # In development, log more verbosely
-    if os.getenv("WEBSITE_HOSTNAME"):  # In production, don't log as heavily
+    # Logging setup
+    default_level = "INFO"  # Default logging level for development
+    if os.getenv("WEBSITE_HOSTNAME"):  # In production, reduce verbosity
         default_level = "WARNING"
     logging.basicConfig(level=os.getenv("APP_LOG_LEVEL", default_level))
 
+    # Configure CORS if allowed origin is set
     if allowed_origin := os.getenv("ALLOWED_ORIGIN"):
         app.logger.info("CORS enabled for %s", allowed_origin)
         cors(app, allow_origin=allowed_origin, allow_methods=["GET", "POST"])
+
+    # Configure Azure Blob Storage container client
+    chatlogs_container_client = ContainerClient(
+        f"https://{AZURE_STORAGE_ACCOUNT}.blob.core.windows.net",
+        AZURE_STORAGE_CHATLOGS,
+        credential=azure_credential,  # Ensure this variable is set earlier in your setup_clients function
+    )
+    app.config["AZURE_STORAGE_CHATLOGS"] = chatlogs_container_client
+    logging.info("Chatlogs container client configured.")
+
     return app
