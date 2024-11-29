@@ -208,23 +208,25 @@ const Chat = () => {
     };
 
 
-    // Get question and answer
+    // Function to save chat
     const saveChat = async () => {
         try {
             if (answers.length === 0) {
                 console.warn("No chat data to save!");
                 return;
             }
-    
-            // Generate messages array
+
+            // Prepare messages array
             const messages = answers.map(([user, response]) => ({
-                user, // User question
-                assistant: response.message.content, // Assistant's answer
+                user, // User's question
+                assistant: response.message?.content || "No response", // Assistant's answer
                 questionTimestamp: new Date().toISOString(), // Timestamp for the question
                 answerTimestamp: new Date().toISOString(), // Timestamp for the answer
             }));
-    
-            // Send the chat messages to the backend
+
+            console.log("Payload being sent to backend:", JSON.stringify({ messages }));
+
+            // Send the chat data to the backend
             const response = await fetch(`${process.env.BACKEND_URI}/save-chat`, {
                 method: "POST",
                 headers: {
@@ -232,18 +234,19 @@ const Chat = () => {
                 },
                 body: JSON.stringify({ messages }),
             });
-    
+
             if (!response.ok) {
-                throw new Error(`Failed to save chat: ${response.statusText}`);
+                console.error(`Failed to save chat: ${response.statusText}`);
+                throw new Error(`HTTP ${response.status}: ${await response.text()}`);
             }
-    
+
             const result = await response.json();
-            console.log(`Chat saved successfully: ${result.filename}`);
+            console.log(`Chat saved successfully. Filename: ${result.filename}`);
         } catch (error) {
-            console.error("Error saving chat:", error);
+            console.error("Error in saveChat:", error);
         }
     };
-    
+   
 
 
 
