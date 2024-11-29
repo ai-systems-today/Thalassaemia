@@ -194,7 +194,7 @@ async def ask(auth_claims: Dict[str, Any]):
 
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 # from quart import request  # Ensure you include this import
 
 # THIS IS THE SAVE API REQUESTS FOR QUESTIONS AND ANSWER
@@ -210,7 +210,7 @@ async def save_chat():
         logging.info(f"Generated chat_id: {chat_id}, User IP: {user_ip}")
 
         messages = request_json.get("messages", [])
-        timestamp = datetime.now(datetime.timezone.utc).isoformat() + "Z"  # Current timestamp in ISO 8601
+        timestamp = datetime.now(timezone.utc).isoformat() + "Z"  # Current timestamp in ISO 8601
         logging.info(f"Messages: {messages}, Timestamp: {timestamp}")
 
         # Format chat data
@@ -221,9 +221,9 @@ async def save_chat():
             "conversation": [
                 {
                     "question": msg["user"],
-                    "questionTimestamp": msg.get("questionTimestamp", datetime.now(datetime.timezone.utc).isoformat() + "Z"),
+                    "questionTimestamp": msg.get("questionTimestamp", datetime.now(timezone.utc).isoformat() + "Z"),
                     "answer": msg["assistant"],
-                    "answerTimestamp": msg.get("answerTimestamp", datetime.now(datetime.timezone.utc).isoformat() + "Z"),
+                    "answerTimestamp": msg.get("answerTimestamp", datetime.now(timezone.utc).isoformat() + "Z"),
                 }
                 for msg in messages
             ],
