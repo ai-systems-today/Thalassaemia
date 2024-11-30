@@ -307,7 +307,7 @@ const Chat = () => {
                 { content: answer, role: "assistant" },
             ];
     
-            const saveWithRetry = async (attempts: number = 3, delay: number = 1000) => {
+            const saveWithRetry: () => Promise<void> = async () => {
                 try {
                     // Timeout logic
                     const controller = new AbortController();
