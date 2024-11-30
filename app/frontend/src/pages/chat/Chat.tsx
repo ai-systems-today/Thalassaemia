@@ -95,48 +95,48 @@ const Chat = () => {
         });
     };
 
-    const handleAsyncRequest = async (question: string, answers: [string, ChatAppResponse][], responseBody: ReadableStream<any>) => {
-        let answer: string = "";
-        let askResponse: ChatAppResponse = {} as ChatAppResponse;
+    // const handleAsyncRequest = async (question: string, answers: [string, ChatAppResponse][], responseBody: ReadableStream<any>) => {
+    //     let answer: string = "";
+    //     let askResponse: ChatAppResponse = {} as ChatAppResponse;
 
-        const updateState = (newContent: string) => {
-            return new Promise(resolve => {
-                setTimeout(() => {
-                    answer += newContent;
-                    const latestResponse: ChatAppResponse = {
-                        ...askResponse,
-                        message: { content: answer, role: askResponse.message.role }
-                    };
-                    setStreamedAnswers([...answers, [question, latestResponse]]);
-                    resolve(null);
-                }, 33);
-            });
-        };
-        try {
-            setIsStreaming(true);
-            for await (const event of readNDJSONStream(responseBody)) {
-                if (event["context"] && event["context"]["data_points"]) {
-                    event["message"] = event["delta"];
-                    askResponse = event as ChatAppResponse;
-                } else if (event["delta"]["content"]) {
-                    setIsLoading(false);
-                    await updateState(event["delta"]["content"]);
-                } else if (event["context"]) {
-                    // Update context with new keys from latest event
-                    askResponse.context = { ...askResponse.context, ...event["context"] };
-                } else if (event["error"]) {
-                    throw Error(event["error"]);
-                }
-            }
-        } finally {
-            setIsStreaming(false);
-        }
-        const fullResponse: ChatAppResponse = {
-            ...askResponse,
-            message: { content: answer, role: askResponse.message.role }
-        };
-        return fullResponse;
-    };
+    //     const updateState = (newContent: string) => {
+    //         return new Promise(resolve => {
+    //             setTimeout(() => {
+    //                 answer += newContent;
+    //                 const latestResponse: ChatAppResponse = {
+    //                     ...askResponse,
+    //                     message: { content: answer, role: askResponse.message.role }
+    //                 };
+    //                 setStreamedAnswers([...answers, [question, latestResponse]]);
+    //                 resolve(null);
+    //             }, 33);
+    //         });
+    //     };
+    //     try {
+    //         setIsStreaming(true);
+    //         for await (const event of readNDJSONStream(responseBody)) {
+    //             if (event["context"] && event["context"]["data_points"]) {
+    //                 event["message"] = event["delta"];
+    //                 askResponse = event as ChatAppResponse;
+    //             } else if (event["delta"]["content"]) {
+    //                 setIsLoading(false);
+    //                 await updateState(event["delta"]["content"]);
+    //             } else if (event["context"]) {
+    //                 // Update context with new keys from latest event
+    //                 askResponse.context = { ...askResponse.context, ...event["context"] };
+    //             } else if (event["error"]) {
+    //                 throw Error(event["error"]);
+    //             }
+    //         }
+    //     } finally {
+    //         setIsStreaming(false);
+    //     }
+    //     const fullResponse: ChatAppResponse = {
+    //         ...askResponse,
+    //         message: { content: answer, role: askResponse.message.role }
+    //     };
+    //     return fullResponse;
+    // };
 
     const client = useLogin ? useMsal().instance : undefined;
     const { loggedIn } = useContext(LoginContext);
@@ -188,7 +188,12 @@ const Chat = () => {
             }
             if (shouldStream) {
                 const parsedResponse: ChatAppResponse = await handleAsyncRequest(question, answers, response.body);
-                setAnswers([...answers, [question, parsedResponse]]);
+
+                // Update the answers state
+                const updatedAnswers: [string, ChatAppResponse][] = [...answers, [question, parsedResponse]];
+                //const updatedAnswers = [...answers, [question, parsedResponse]];
+                setAnswers(updatedAnswers)
+                // setAnswers([...answers, [question, parsedResponse]]);
                 // Save the chat after the streamed response
                 await saveChat(question, parsedResponse.message.content);
             } else {
@@ -196,9 +201,16 @@ const Chat = () => {
                 if (response.status > 299 || !response.ok) {
                     throw Error(parsedResponse.error || "Unknown error");
                 }
-                setAnswers([...answers, [question, parsedResponse as ChatAppResponse]]);
+                //setAnswers([...answers, [question, parsedResponse as ChatAppResponse]]);
+                // Update answers state
+                const updatedAnswers: [string, ChatAppResponse][] = [
+                    ...answers,
+                    [question, parsedResponse as ChatAppResponse]
+                ];
+                setAnswers(updatedAnswers);
                 // Save the chat after the streamed response
-                await saveChat(question, parsedResponse.message.content);
+                //await saveChat(question, parsedResponse.message.content);
+                await saveChat(question, (parsedResponse as ChatAppResponse).message.content);
             }
         } catch (e) {
             setError(e);
@@ -247,6 +259,42 @@ const Chat = () => {
     //     }
     // };
    
+    // const saveChat = async (question: string, answer: string) => {
+    //     try {
+    //         if (!question || !answer) {
+    //             console.warn("Missing question or answer. Skipping saveChat.");
+    //             return;
+    //         }
+    
+    //         // Prepare the payload
+    //         const messages = [
+    //             { content: question, role: "user" },
+    //             { content: answer, role: "assistant" },
+    //         ];
+    
+    //         // Debugging log
+    //         console.log("Payload sent to backend:", messages);
+    
+    //         // Send the payload to the backend
+    //         const response = await fetch(`${process.env.BACKEND_URI}/save-chat`, {
+    //             method: "POST",
+    //             headers: {
+    //                 "Content-Type": "application/json",
+    //             },
+    //             body: JSON.stringify({ messages }),
+    //         });
+    
+    //         // Handle backend response
+    //         if (!response.ok) {
+    //             throw new Error(`Failed to save chat: ${response.statusText}`);
+    //         }
+    
+    //         const result = await response.json();
+    //         console.log(`Chat saved successfully: ${result.filename}`);
+    //     } catch (error) {
+    //         console.error("Error in saveChat:", error);
+    //     }
+    // };
     const saveChat = async (question: string, answer: string) => {
         try {
             if (!question || !answer) {
@@ -254,34 +302,99 @@ const Chat = () => {
                 return;
             }
     
-            // Prepare the payload
             const messages = [
                 { content: question, role: "user" },
                 { content: answer, role: "assistant" },
             ];
     
-            // Debugging log
-            console.log("Payload sent to backend:", messages);
+            const saveWithRetry = async (attempts: number = 3, delay: number = 1000) => {
+                try {
+                    // Timeout logic
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 5000);
     
-            // Send the payload to the backend
-            const response = await fetch(`${process.env.BACKEND_URI}/save-chat`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ messages }),
-            });
+                    const response = await fetch(`${process.env.BACKEND_URI}/save-chat`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ messages }),
+                        signal: controller.signal,
+                    });
     
-            // Handle backend response
-            if (!response.ok) {
-                throw new Error(`Failed to save chat: ${response.statusText}`);
-            }
+                    clearTimeout(timeoutId);
     
-            const result = await response.json();
-            console.log(`Chat saved successfully: ${result.filename}`);
+                    if (!response.ok) {
+                        throw new Error(`Failed to save chat: ${response.statusText}`);
+                    }
+    
+                    const result = await response.json();
+                    console.log(`Chat saved successfully: ${result.filename}`);
+                    return result;
+                } catch (error) {
+                    if (attempts > 1) {
+                        console.warn(`Retrying saveChat... (${3 - attempts + 1} attempts left)`);
+                        await new Promise((resolve) => setTimeout(resolve, delay));
+                        return saveWithRetry(attempts - 1, delay * 2); // Exponential backoff
+                    }
+                    throw error;
+                }
+            };
+    
+            const result = await saveWithRetry();
+            // Notify user of success
+            alert("Chat saved successfully!");
+            return result;
         } catch (error) {
             console.error("Error in saveChat:", error);
+            // Notify user of failure
+            alert("Failed to save the chat. Please try again.");
         }
+    };
+    
+    const handleAsyncRequest = async (
+        question: string,
+        answers: [string, ChatAppResponse][],
+        responseBody: ReadableStream<any>
+    ) => {
+        let answer: string = "";
+        let askResponse: ChatAppResponse = {} as ChatAppResponse;
+    
+        const updateState = (newContent: string) => {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    answer += newContent;
+                    const latestResponse: ChatAppResponse = {
+                        ...askResponse,
+                        message: { content: answer, role: askResponse.message.role },
+                    };
+                    setStreamedAnswers([...answers, [question, latestResponse]]);
+                    resolve(null);
+                }, 33);
+            });
+        };
+    
+        try {
+            setIsStreaming(true);
+            for await (const event of readNDJSONStream(responseBody)) {
+                if (event["context"] && event["context"]["data_points"]) {
+                    event["message"] = event["delta"];
+                    askResponse = event as ChatAppResponse;
+                } else if (event["delta"]["content"]) {
+                    setIsLoading(false);
+                    await updateState(event["delta"]["content"]);
+                } else if (event["context"]) {
+                    askResponse.context = { ...askResponse.context, ...event["context"] };
+                } else if (event["error"]) {
+                    throw Error(event["error"]);
+                }
+            }
+        } finally {
+            setIsStreaming(false);
+        }
+        const fullResponse: ChatAppResponse = {
+            ...askResponse,
+            message: { content: answer, role: askResponse.message.role },
+        };
+        return fullResponse;
     };
     
 

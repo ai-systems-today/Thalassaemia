@@ -1,3 +1,4 @@
+import asyncio
 import dataclasses
 import io
 import json
@@ -274,7 +275,59 @@ from datetime import datetime, timezone
 #         logging.error("Error saving chat log", exc_info=e)
 #         return jsonify({"error": "Failed to save chat log", "details": str(e)}), 500
 
-# Updated save_chat
+# # Updated save_chat
+# @bp.post("/save-chat")
+# async def save_chat():
+#     try:
+#         # Parse request data
+#         request_json = await request.get_json()
+#         logging.info(f"Received request data: {request_json}")
+
+#         # Generate chatId and other metadata
+#         chat_id = str(uuid.uuid4())
+#         user_ip = request.headers.get("X-Forwarded-For", request.remote_addr)
+#         timestamp = datetime.now(timezone.utc).isoformat() + "Z"
+
+#         # Extract the messages
+#         messages = request_json.get("messages", [])
+#         if len(messages) != 2 or messages[0]["role"] != "user" or messages[1]["role"] != "assistant":
+#             return jsonify({"error": "Invalid payload structure. Expecting a single user-assistant pair."}), 400
+
+#         # Prepare a simple structure for storage
+#         question = messages[0]["content"]
+#         answer = messages[1]["content"]
+
+#         chat_data = {
+#             "chatId": chat_id,
+#             "timestamp": timestamp,
+#             "userIp": user_ip,
+#             "question": question,
+#             "answer": answer,
+#         }
+
+#         # Serialize to JSON
+#         chat_json = json.dumps(chat_data, indent=2)
+#         logging.info(f"Chat JSON to save: {chat_json}")
+
+#         # Save as chatId-timestamp.json
+#         filename = f"{chat_id}-{timestamp}.json"
+#         logging.info(f"Saving to file: {filename}")
+
+#         # Save to Azure Storage
+#         chatlogs_container_client: ContainerClient = current_app.config["AZURE_STORAGE_CHATLOGS"]
+#         blob_client = chatlogs_container_client.get_blob_client(filename)
+#         await blob_client.upload_blob(chat_json, overwrite=True)
+#         logging.info(f"Chat log successfully saved: {filename}")
+
+#         return jsonify({"message": "Chat saved successfully", "filename": filename}), 200
+#     except Exception as e:
+#         logging.error("Error saving chat log", exc_info=e)
+#         return jsonify({"error": "Failed to save chat log", "details": str(e)}), 500
+
+import uuid
+from datetime import datetime, timezone
+from azure.core.exceptions import AzureError
+
 @bp.post("/save-chat")
 async def save_chat():
     try:
@@ -282,47 +335,59 @@ async def save_chat():
         request_json = await request.get_json()
         logging.info(f"Received request data: {request_json}")
 
-        # Generate chatId and other metadata
-        chat_id = str(uuid.uuid4())
-        user_ip = request.headers.get("X-Forwarded-For", request.remote_addr)
-        timestamp = datetime.now(timezone.utc).isoformat() + "Z"
-
-        # Extract the messages
+        # Validate messages
         messages = request_json.get("messages", [])
         if len(messages) != 2 or messages[0]["role"] != "user" or messages[1]["role"] != "assistant":
             return jsonify({"error": "Invalid payload structure. Expecting a single user-assistant pair."}), 400
 
-        # Prepare a simple structure for storage
-        question = messages[0]["content"]
-        answer = messages[1]["content"]
+        # Validate content size
+        if any(len(msg.get("content", "")) > 5000 for msg in messages):  # Adjust size limit as needed
+            return jsonify({"error": "Message content too large."}), 400
 
+        # Generate metadata
+        chat_id = str(uuid.uuid4())
+        timestamp = datetime.now(timezone.utc).isoformat() + "Z"
+        user_ip = request.headers.get("X-Forwarded-For", request.remote_addr)
+
+        # Prepare payload for storage
         chat_data = {
             "chatId": chat_id,
             "timestamp": timestamp,
             "userIp": user_ip,
-            "question": question,
-            "answer": answer,
+            "question": messages[0]["content"],
+            "answer": messages[1]["content"],
         }
-
-        # Serialize to JSON
         chat_json = json.dumps(chat_data, indent=2)
-        logging.info(f"Chat JSON to save: {chat_json}")
-
-        # Save as chatId-timestamp.json
         filename = f"{chat_id}-{timestamp}.json"
-        logging.info(f"Saving to file: {filename}")
+        logging.info(f"Saving chat to file: {filename}")
 
-        # Save to Azure Storage
+        # Save to Azure Blob Storage with retry logic
         chatlogs_container_client: ContainerClient = current_app.config["AZURE_STORAGE_CHATLOGS"]
-        blob_client = chatlogs_container_client.get_blob_client(filename)
-        await blob_client.upload_blob(chat_json, overwrite=True)
-        logging.info(f"Chat log successfully saved: {filename}")
+
+        async def upload_with_retry(blob_name, content, attempts=3, delay=1):
+            for attempt in range(1, attempts + 1):
+                try:
+                    blob_client = chatlogs_container_client.get_blob_client(blob_name)
+                    await blob_client.upload_blob(content, overwrite=True)
+                    logging.info(f"Chat log saved: {blob_name}")
+                    return
+                except AzureError as e:
+                    if attempt == attempts:
+                        raise
+                    logging.warning(f"Upload failed (attempt {attempt}): {e}. Retrying...")
+                    await asyncio.sleep(delay)
+                    delay *= 2  # Exponential backoff
+
+        await upload_with_retry(filename, chat_json)
 
         return jsonify({"message": "Chat saved successfully", "filename": filename}), 200
-    except Exception as e:
-        logging.error("Error saving chat log", exc_info=e)
-        return jsonify({"error": "Failed to save chat log", "details": str(e)}), 500
 
+    except AzureError as azure_err:
+        logging.error("Azure error while saving chat log", exc_info=azure_err)
+        return jsonify({"error": "Failed to save chat log", "details": str(azure_err)}), 500
+    except Exception as e:
+        logging.error("Unexpected error saving chat log", exc_info=e)
+        return jsonify({"error": "An unexpected error occurred", "details": str(e)}), 500
 
 
 class JSONEncoder(json.JSONEncoder):
