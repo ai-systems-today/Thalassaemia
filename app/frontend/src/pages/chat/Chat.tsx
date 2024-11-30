@@ -190,7 +190,7 @@ const Chat = () => {
                 const parsedResponse: ChatAppResponse = await handleAsyncRequest(question, answers, response.body);
                 setAnswers([...answers, [question, parsedResponse]]);
                 // Save the chat after the streamed response
-                await saveChat();
+                await saveChat(question, parsedResponse.message.content);
             } else {
                 const parsedResponse: ChatAppResponseOrError = await response.json();
                 if (response.status > 299 || !response.ok) {
@@ -198,7 +198,7 @@ const Chat = () => {
                 }
                 setAnswers([...answers, [question, parsedResponse as ChatAppResponse]]);
                 // Save the chat after the streamed response
-                await saveChat();
+                await saveChat(question, parsedResponse.message.content);
             }
         } catch (e) {
             setError(e);
@@ -208,25 +208,62 @@ const Chat = () => {
     };
 
 
-    // Function to save chat
-    const saveChat = async () => {
+    // // Function to save chat
+    // const saveChat = async () => {
+    //     try {
+    //         if (answers.length === 0) {
+    //             console.warn("No chat data to save!");
+    //             return;
+    //         }
+
+    //         // Prepare messages array
+    //         const messages = answers.map(([user, response]) => ({
+    //             user, // User's question
+    //             assistant: response.message?.content || "No response", // Assistant's answer
+    //             questionTimestamp: new Date().toISOString(), // Timestamp for the question
+    //             answerTimestamp: new Date().toISOString(), // Timestamp for the answer
+    //         }));
+
+    //         console.log("Payload being sent to backend:", JSON.stringify({ messages }));
+
+    //         // Send the chat data to the backend
+    //         const response = await fetch(`${process.env.BACKEND_URI}/save-chat`, {
+    //             method: "POST",
+    //             headers: {
+    //                 "Content-Type": "application/json",
+    //             },
+    //             body: JSON.stringify({ messages }),
+    //         });
+
+    //         if (!response.ok) {
+    //             console.error(`Failed to save chat: ${response.statusText}`);
+    //             throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+    //         }
+
+    //         const result = await response.json();
+    //         console.log(`Chat saved successfully. Filename: ${result.filename}`);
+    //     } catch (error) {
+    //         console.error("Error in saveChat:", error);
+    //     }
+    // };
+   
+    const saveChat = async (question: string, answer: string) => {
         try {
-            if (answers.length === 0) {
-                console.warn("No chat data to save!");
+            if (!question || !answer) {
+                console.warn("Missing question or answer. Skipping saveChat.");
                 return;
             }
-
-            // Prepare messages array
-            const messages = answers.map(([user, response]) => ({
-                user, // User's question
-                assistant: response.message?.content || "No response", // Assistant's answer
-                questionTimestamp: new Date().toISOString(), // Timestamp for the question
-                answerTimestamp: new Date().toISOString(), // Timestamp for the answer
-            }));
-
-            console.log("Payload being sent to backend:", JSON.stringify({ messages }));
-
-            // Send the chat data to the backend
+    
+            // Prepare the payload
+            const messages = [
+                { content: question, role: "user" },
+                { content: answer, role: "assistant" },
+            ];
+    
+            // Debugging log
+            console.log("Payload sent to backend:", messages);
+    
+            // Send the payload to the backend
             const response = await fetch(`${process.env.BACKEND_URI}/save-chat`, {
                 method: "POST",
                 headers: {
@@ -234,21 +271,19 @@ const Chat = () => {
                 },
                 body: JSON.stringify({ messages }),
             });
-
+    
+            // Handle backend response
             if (!response.ok) {
-                console.error(`Failed to save chat: ${response.statusText}`);
-                throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+                throw new Error(`Failed to save chat: ${response.statusText}`);
             }
-
+    
             const result = await response.json();
-            console.log(`Chat saved successfully. Filename: ${result.filename}`);
+            console.log(`Chat saved successfully: ${result.filename}`);
         } catch (error) {
             console.error("Error in saveChat:", error);
         }
     };
-   
-
-
+    
 
     const clearChat = () => {
         lastQuestionRef.current = "";
@@ -740,3 +775,7 @@ const Chat = () => {
 };
 
 export default Chat;
+function generateChatId(): string | null {
+    throw new Error("Function not implemented.");
+}
+

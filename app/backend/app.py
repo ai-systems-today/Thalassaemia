@@ -197,82 +197,133 @@ import uuid
 from datetime import datetime, timezone
 # from quart import request  # Ensure you include this import
 
-# Route to save chat logs
+# # Route to save chat logs
+# @bp.post("/save-chat")
+# async def save_chat():
+#     """
+#     Saves chat messages to Azure Blob Storage.
+
+#     - Expects a JSON payload in the format:
+#       {
+#           "messages": [
+#               {"user": "Hello", "assistant": "Hi there!"}
+#           ]
+#       }
+#     """
+#     try:
+#         # Parse incoming request
+#         request_json = await request.get_json()
+#         logging.info(f"Received request data: {json.dumps(request_json, indent=2)}")
+        
+#         # Generate unique identifiers and timestamps
+#         chat_id = str(uuid.uuid4())  # Unique chat identifier
+#         user_ip = request.headers.get("X-Forwarded-For", request.remote_addr)  # User IP
+#         logging.info(f"Generated chat_id: {chat_id}, User IP: {user_ip}")
+
+#         # Extract messages and validate
+#         messages = request_json.get("messages", [])
+#         if not messages or not isinstance(messages, list):
+#             raise ValueError("Invalid 'messages' payload: Expected a non-empty list.")
+
+#         timestamp = datetime.now(timezone.utc).isoformat() + "Z"  # Timestamp
+#         logging.info(f"Timestamp: {timestamp}")
+
+#         # Prepare chat data structure
+#         chat_data = {
+#             "chatId": chat_id,
+#             "timestamp": timestamp,
+#             "userIp": user_ip,
+#             "conversation": [
+#                 {
+#                     "question": msg["user"],
+#                     "questionTimestamp": msg.get("questionTimestamp", datetime.now(timezone.utc).isoformat() + "Z"),
+#                     "answer": msg["assistant"],
+#                     "answerTimestamp": msg.get("answerTimestamp", datetime.now(timezone.utc).isoformat() + "Z"),
+#                 }
+#                 for msg in messages if "user" in msg and "assistant" in msg
+#             ],
+#         }
+
+#         # Validate chat data
+#         if not chat_data["conversation"]:
+#             raise ValueError("No valid conversation entries found in the messages payload.")
+
+#         # Convert chat data to JSON string
+#         chat_json = json.dumps(chat_data, indent=2)
+#         logging.info(f"Chat JSON prepared: {chat_json}")
+
+#         # Define filename for storage
+#         filename = f"{chat_id}-{timestamp}.json"
+#         logging.info(f"Filename to save: {filename}")
+
+#         # Save to Azure Blob Storage
+#         chatlogs_container_client: ContainerClient = current_app.config["AZURE_STORAGE_CHATLOGS"]
+#         logging.info(f"Initialized chatlogs container client: {chatlogs_container_client}")
+
+#         blob_client = chatlogs_container_client.get_blob_client(filename)
+#         await blob_client.upload_blob(chat_json, overwrite=True)
+#         logging.info("Chat log successfully saved.")
+
+#         # Return success response
+#         return jsonify({"message": "Chat saved successfully", "filename": filename}), 200
+
+#     except ValueError as ve:
+#         logging.error("Validation error", exc_info=ve)
+#         return jsonify({"error": "Validation error", "details": str(ve)}), 400
+#     except Exception as e:
+#         logging.error("Error saving chat log", exc_info=e)
+#         return jsonify({"error": "Failed to save chat log", "details": str(e)}), 500
+
+# Updated save_chat
 @bp.post("/save-chat")
 async def save_chat():
-    """
-    Saves chat messages to Azure Blob Storage.
-
-    - Expects a JSON payload in the format:
-      {
-          "messages": [
-              {"user": "Hello", "assistant": "Hi there!"}
-          ]
-      }
-    """
     try:
-        # Parse incoming request
+        # Parse request data
         request_json = await request.get_json()
-        logging.info(f"Received request data: {json.dumps(request_json, indent=2)}")
-        
-        # Generate unique identifiers and timestamps
-        chat_id = str(uuid.uuid4())  # Unique chat identifier
-        user_ip = request.headers.get("X-Forwarded-For", request.remote_addr)  # User IP
-        logging.info(f"Generated chat_id: {chat_id}, User IP: {user_ip}")
+        logging.info(f"Received request data: {request_json}")
 
-        # Extract messages and validate
+        # Generate chatId and other metadata
+        chat_id = str(uuid.uuid4())
+        user_ip = request.headers.get("X-Forwarded-For", request.remote_addr)
+        timestamp = datetime.now(timezone.utc).isoformat() + "Z"
+
+        # Extract the messages
         messages = request_json.get("messages", [])
-        if not messages or not isinstance(messages, list):
-            raise ValueError("Invalid 'messages' payload: Expected a non-empty list.")
+        if len(messages) != 2 or messages[0]["role"] != "user" or messages[1]["role"] != "assistant":
+            return jsonify({"error": "Invalid payload structure. Expecting a single user-assistant pair."}), 400
 
-        timestamp = datetime.now(timezone.utc).isoformat() + "Z"  # Timestamp
-        logging.info(f"Timestamp: {timestamp}")
+        # Prepare a simple structure for storage
+        question = messages[0]["content"]
+        answer = messages[1]["content"]
 
-        # Prepare chat data structure
         chat_data = {
             "chatId": chat_id,
             "timestamp": timestamp,
             "userIp": user_ip,
-            "conversation": [
-                {
-                    "question": msg["user"],
-                    "questionTimestamp": msg.get("questionTimestamp", datetime.now(timezone.utc).isoformat() + "Z"),
-                    "answer": msg["assistant"],
-                    "answerTimestamp": msg.get("answerTimestamp", datetime.now(timezone.utc).isoformat() + "Z"),
-                }
-                for msg in messages if "user" in msg and "assistant" in msg
-            ],
+            "question": question,
+            "answer": answer,
         }
 
-        # Validate chat data
-        if not chat_data["conversation"]:
-            raise ValueError("No valid conversation entries found in the messages payload.")
-
-        # Convert chat data to JSON string
+        # Serialize to JSON
         chat_json = json.dumps(chat_data, indent=2)
-        logging.info(f"Chat JSON prepared: {chat_json}")
+        logging.info(f"Chat JSON to save: {chat_json}")
 
-        # Define filename for storage
+        # Save as chatId-timestamp.json
         filename = f"{chat_id}-{timestamp}.json"
-        logging.info(f"Filename to save: {filename}")
+        logging.info(f"Saving to file: {filename}")
 
-        # Save to Azure Blob Storage
+        # Save to Azure Storage
         chatlogs_container_client: ContainerClient = current_app.config["AZURE_STORAGE_CHATLOGS"]
-        logging.info(f"Initialized chatlogs container client: {chatlogs_container_client}")
-
         blob_client = chatlogs_container_client.get_blob_client(filename)
         await blob_client.upload_blob(chat_json, overwrite=True)
-        logging.info("Chat log successfully saved.")
+        logging.info(f"Chat log successfully saved: {filename}")
 
-        # Return success response
         return jsonify({"message": "Chat saved successfully", "filename": filename}), 200
-
-    except ValueError as ve:
-        logging.error("Validation error", exc_info=ve)
-        return jsonify({"error": "Validation error", "details": str(ve)}), 400
     except Exception as e:
         logging.error("Error saving chat log", exc_info=e)
         return jsonify({"error": "Failed to save chat log", "details": str(e)}), 500
+
+
 
 class JSONEncoder(json.JSONEncoder):
     def default(self, o):
