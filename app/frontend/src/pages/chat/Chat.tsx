@@ -307,11 +307,15 @@ const Chat = () => {
                 { content: answer, role: "assistant" },
             ];
     
-            const saveWithRetry: () => Promise<void> = async () => {
+            // Retry logic with exponential backoff
+            const saveWithRetry = async (
+                attempts: number = 3, // Number of retry attempts
+                delay: number = 1000 // Initial delay in milliseconds
+            ): Promise<void> => {
                 try {
-                    // Timeout logic
+                    // Timeout controller for fetch
                     const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 5000);
+                    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5-second timeout
     
                     const response = await fetch(`${process.env.BACKEND_URI}/save-chat`, {
                         method: "POST",
@@ -320,7 +324,7 @@ const Chat = () => {
                         signal: controller.signal,
                     });
     
-                    clearTimeout(timeoutId);
+                    clearTimeout(timeoutId); // Clear timeout after fetch
     
                     if (!response.ok) {
                         throw new Error(`Failed to save chat: ${response.statusText}`);
@@ -331,17 +335,17 @@ const Chat = () => {
                     return result;
                 } catch (error) {
                     if (attempts > 1) {
-                        console.warn(`Retrying saveChat... (${3 - attempts + 1} attempts left)`);
-                        await new Promise((resolve) => setTimeout(resolve, delay));
+                        console.warn(`Retrying saveChat... (${4 - attempts} attempts left)`);
+                        await new Promise((resolve) => setTimeout(resolve, delay)); // Delay before retry
                         return saveWithRetry(attempts - 1, delay * 2); // Exponential backoff
                     }
-                    throw error;
+                    throw error; // Re-throw error after max retries
                 }
             };
     
-            const result = await saveWithRetry();
+            const result = await saveWithRetry(); // Call the retry-enabled save function
             // Notify user of success
-            alert("Chat saved successfully!");
+            console.log("Chat saved successfully!");
             return result;
         } catch (error) {
             console.error("Error in saveChat:", error);
@@ -349,6 +353,7 @@ const Chat = () => {
             alert("Failed to save the chat. Please try again.");
         }
     };
+    
     
     const handleAsyncRequest = async (
         question: string,
