@@ -34,7 +34,9 @@ export default defineConfig({
             "/config": "http://localhost:50505",
             "/upload": "http://localhost:50505",
             "/delete_uploaded": "http://localhost:50505",
-            "/list_uploaded": "http://localhost:50505"
+            "/list_uploaded": "http://localhost:50505",
+            "/save-chat": "http://localhost:50505", // Proxy for saving chats
+            "/chatlogs/": "http://localhost:50505"  // Proxy for fetching saved chats
         }
     }
 });

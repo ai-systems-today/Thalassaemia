@@ -295,65 +295,65 @@ const Chat = () => {
     //         console.error("Error in saveChat:", error);
     //     }
     // };
+    // Ensure saveChat is defined in the file
     const saveChat = async (question: string, answer: string) => {
         try {
             if (!question || !answer) {
                 console.warn("Missing question or answer. Skipping saveChat.");
                 return;
             }
-    
+
             const messages = [
                 { content: question, role: "user" },
                 { content: answer, role: "assistant" },
             ];
-    
-            // Retry logic with exponential backoff
-            const saveWithRetry = async (
-                attempts: number = 3, // Number of retry attempts
-                delay: number = 1000 // Initial delay in milliseconds
-            ): Promise<void> => {
+
+            const saveWithRetry = async (attempts: number = 3, delay: number = 1000): Promise<void> => {
                 try {
-                    // Timeout controller for fetch
                     const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5-second timeout
-    
+                    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
                     const response = await fetch(`${process.env.BACKEND_URI}/save-chat`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ messages }),
                         signal: controller.signal,
                     });
-    
-                    clearTimeout(timeoutId); // Clear timeout after fetch
-    
+
+                    clearTimeout(timeoutId);
+
                     if (!response.ok) {
                         throw new Error(`Failed to save chat: ${response.statusText}`);
                     }
-    
+
                     const result = await response.json();
                     console.log(`Chat saved successfully: ${result.filename}`);
                     return result;
                 } catch (error) {
                     if (attempts > 1) {
                         console.warn(`Retrying saveChat... (${4 - attempts} attempts left)`);
-                        await new Promise((resolve) => setTimeout(resolve, delay)); // Delay before retry
-                        return saveWithRetry(attempts - 1, delay * 2); // Exponential backoff
+                        await new Promise((resolve) => setTimeout(resolve, delay));
+                        return saveWithRetry(attempts - 1, delay * 2);
                     }
-                    throw error; // Re-throw error after max retries
+                    throw error;
                 }
             };
-    
-            const result = await saveWithRetry(); // Call the retry-enabled save function
-            // Notify user of success
+
+            const result = await saveWithRetry();
             console.log("Chat saved successfully!");
             return result;
         } catch (error) {
             console.error("Error in saveChat:", error);
-            // Notify user of failure
             alert("Failed to save the chat. Please try again.");
         }
     };
-    
+
+    // Make saveChat accessible in the browser console
+    if (typeof window !== "undefined") {
+        (window as any).saveChat = saveChat; // Explicitly assign it to window
+    }
+
+
     
     const handleAsyncRequest = async (
         question: string,
