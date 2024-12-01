@@ -312,8 +312,9 @@ const Chat = () => {
                 try {
                     const controller = new AbortController();
                     const timeoutId = setTimeout(() => controller.abort(), 5000);
-
-                    const response = await fetch(`${process.env.BACKEND_URI}/save-chat`, {
+                    // Use import.meta.env to access VITE_BACKEND_URI
+                    const response = await fetch(`${import.meta.env.VITE_BACKEND_URI}/save-chat`, {
+                    //const response = await fetch(`${process.env.BACKEND_URI}/save-chat`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ messages }),

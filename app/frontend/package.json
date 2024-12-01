@@ -19,6 +19,7 @@
     "@fluentui/react-icons": "^2.0.221",
     "@react-spring/web": "^9.7.3",
     "dompurify": "^3.0.6",
+    "dotenv": "^16.4.5",
     "marked": "^13.0.0",
     "ndjson-readablestream": "^1.2.0",
     "react": "^18.3.1",
@@ -30,6 +31,7 @@
   "devDependencies": {
     "@types/dom-speech-recognition": "^0.0.4",
     "@types/dompurify": "^3.0.4",
+    "@types/dotenv": "^8.2.3",
     "@types/node": "^22.10.1",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",

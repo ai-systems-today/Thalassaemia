@@ -1,5 +1,9 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import dotenv from "dotenv";
+
+// Load the .env file
+dotenv.config();
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -35,7 +39,7 @@ export default defineConfig({
             "/upload": "http://localhost:50505",
             "/delete_uploaded": "http://localhost:50505",
             "/list_uploaded": "http://localhost:50505",
-            "/save-chat": "http://localhost:50505", // Proxy for saving chats
+            "/save-chat": "https://app-backend-tfkx7gjbumrtq.azurewebsites.net", //"http://localhost:50505", // Proxy for saving chats
             "/chatlogs/": "http://localhost:50505"  // Proxy for fetching saved chats
         }
     }
