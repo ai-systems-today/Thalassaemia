@@ -15,7 +15,7 @@ from approaches.approach import ThoughtStep
 from approaches.chatapproach import ChatApproach
 from core.authentication import AuthenticationHelper
 
-from approaches.approach import detect_user_type
+from approaches.approach import Approach
 
 
 class ChatReadRetrieveReadApproach(ChatApproach):
@@ -176,7 +176,7 @@ class ChatReadRetrieveReadApproach(ChatApproach):
         # STEP 1: Detect user type and customize behavior
         # Detect user type from the question
         user_question = messages[-1]["content"]
-        user_type = detect_user_type(user_question)
+        user_type = Approach.detect_user_type(user_question)
 
         # Get few-shots based on user type
         few_shots = self.get_few_shots(user_type)
@@ -195,7 +195,7 @@ class ChatReadRetrieveReadApproach(ChatApproach):
             model=self.chatgpt_model,
             system_prompt=self.query_prompt_template,
             tools=tools,
-            few_shots=few_shots, #self.query_prompt_few_shots,
+            few_shots=few_shots, #self.query_prompt_few_shots
             past_messages=messages[:-1],
             new_user_content=user_query_request,
             max_tokens=self.chatgpt_token_limit - query_response_token_limit,

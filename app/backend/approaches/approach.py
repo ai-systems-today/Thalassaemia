@@ -117,6 +117,7 @@ class Approach(ABC):
         self.vision_endpoint = vision_endpoint
         self.vision_token_provider = vision_token_provider
 
+    @staticmethod
     def detect_user_type(question: str) -> str:
         """
         Detects the user type based on the content of the question.
