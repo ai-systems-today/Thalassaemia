@@ -15,6 +15,8 @@ from approaches.approach import ThoughtStep
 from approaches.chatapproach import ChatApproach
 from core.authentication import AuthenticationHelper
 
+from approaches.approach import detect_user_type
+
 
 class ChatReadRetrieveReadApproach(ChatApproach):
     """
@@ -52,6 +54,38 @@ class ChatReadRetrieveReadApproach(ChatApproach):
         self.query_language = query_language
         self.query_speller = query_speller
         self.chatgpt_token_limit = get_token_limit(chatgpt_model)
+
+    def get_few_shots(self, user_type: str) -> List[dict]:
+        """
+        Returns few-shot examples based on the detected user type.
+
+        Args:
+            user_type (str): The detected user type.
+
+        Returns:
+            List[dict]: Few-shot examples for the user type.
+        """
+        few_shots = {
+            "patient": [
+                {"role": "user", "content": "What is the best treatment for thalassaemia?"},
+                {"role": "assistant", "content": "Treatment depends on the type and severity. Common options include transfusions and chelation therapy."},
+            ],
+            "healthcare professional": [
+                {"role": "user", "content": "What are the latest guidelines for thalassaemia treatment?"},
+                {"role": "assistant", "content": "Refer to the TDT 4th edition for the latest protocols on transfusion and chelation therapy."},
+            ],
+            "community": [
+                {"role": "user", "content": "How can we raise awareness about thalassaemia?"},
+                {"role": "assistant", "content": "Organize campaigns, promote genetic testing, and educate through local health initiatives."},
+            ],
+            "pharma": [
+                {"role": "user", "content": "What are the recent advancements in drug development for thalassaemia?"},
+                {"role": "assistant", "content": "Research on gene therapy and luspatercept shows promising results for reducing transfusion dependence."},
+            ],
+            "general": [],
+        }
+        return few_shots.get(user_type, [])
+    
 
     # @property
     # def system_message_chat_conversation(self):
@@ -138,14 +172,30 @@ class ChatReadRetrieveReadApproach(ChatApproach):
                 },
             }
         ]
+                
+        # STEP 1: Detect user type and customize behavior
+        # Detect user type from the question
+        user_question = messages[-1]["content"]
+        user_type = detect_user_type(user_question)
+
+        # Get few-shots based on user type
+        few_shots = self.get_few_shots(user_type)
+
+        # Customize the system prompt
+        system_message = self.get_system_prompt(
+            overrides.get("prompt_template"),
+            f"Respond as if the user is a {user_type}.",
+        )
 
         # STEP 1: Generate an optimized keyword search query based on the chat history and the last question
         query_response_token_limit = 100
+
+        # Pass user-type-specific few-shots
         query_messages = build_messages(
             model=self.chatgpt_model,
             system_prompt=self.query_prompt_template,
             tools=tools,
-            few_shots=self.query_prompt_few_shots,
+            few_shots=few_shots, #self.query_prompt_few_shots,
             past_messages=messages[:-1],
             new_user_content=user_query_request,
             max_tokens=self.chatgpt_token_limit - query_response_token_limit,

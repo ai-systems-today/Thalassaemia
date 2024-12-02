@@ -117,6 +117,29 @@ class Approach(ABC):
         self.vision_endpoint = vision_endpoint
         self.vision_token_provider = vision_token_provider
 
+    def detect_user_type(question: str) -> str:
+        """
+        Detects the user type based on the content of the question.
+
+        Args:
+            question (str): The user's question.
+
+        Returns:
+            str: The user type (e.g., 'patient', 'healthcare professional', 'community', or 'pharma').
+        """
+        keywords = {
+            "patient": ["symptoms", "treatment", "effects", "support"],
+            "healthcare professional": ["guidelines", "diagnosis", "treatment protocol", "clinical"],
+            "community": ["awareness", "campaign", "policy", "education"],
+            "pharma": ["drug development", "clinical trial", "advancement", "research"],
+        }
+
+        for user_type, keyword_list in keywords.items():
+            if any(keyword in question.lower() for keyword in keyword_list):
+                return user_type
+
+        return "general"  # Default to general if no match
+
     def build_filter(self, overrides: dict[str, Any], auth_claims: dict[str, Any]) -> Optional[str]:
         exclude_category = overrides.get("exclude_category")
         security_filter = self.auth_helper.build_security_filters(overrides, auth_claims)
