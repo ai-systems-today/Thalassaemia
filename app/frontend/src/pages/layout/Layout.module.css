@@ -83,3 +83,25 @@
     margin-right: 10px; /* Space between icon and text */
     vertical-align: middle;
 }
+
+/* Mobile-specific styles */
+@media only screen and (max-width: 480px) {
+    .headerTitleContainer {
+        margin-right: 0; /* Remove unnecessary margin */
+        flex-direction: column; /* Stack elements vertically */
+        align-items: center; /* Center items for better mobile experience */
+    }
+
+    .headerTitle {
+        font-size: 18px; /* Adjusted to a readable size on smaller screens */
+        text-align: center; /* Center-align the text */
+        white-space: nowrap; /* Prevent text from wrapping */
+    }
+
+    .headerIcon {
+        width: 28px; /* Slightly reduce the logo size for mobile */
+        height: 28px;
+        margin-right: 0; /* Remove horizontal margin for stacked alignment */
+        margin-bottom: 8px; /* Add spacing below the icon */
+    }
+}
