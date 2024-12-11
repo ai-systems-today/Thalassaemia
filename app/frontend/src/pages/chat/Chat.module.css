@@ -31,15 +31,23 @@
 }
 
 .chatEmptyStateTitle {
-    font-size: 4rem;
+    font-size: 2.5rem; /* Adjust size for smaller screens */
     font-weight: 600;
-    margin-top: 0;
-    margin-bottom: 30px;
+    text-align: center; /* Center aligns the title */
+    margin: 10px auto; /* Space above and below the title */
+    max-width: 90%; /* Prevents the title from being too wide */
+    line-height: 1.2; /* Ensures spacing between lines is compact */
+    /* margin-top: 0; */
+    /* margin-bottom: 30px; */
 }
 
 .chatEmptyStateSubtitle {
-    font-weight: 600;
-    margin-bottom: 10px;
+    font-size: 1.2rem; /* Reduce font size for mobile */
+    font-weight: 500;
+    text-align: center; /* Center aligns the subtitle */
+    margin: 0 auto 20px auto; /* Space below the subtitle */
+    max-width: 80%; /* Prevents text from stretching too wide */
+    /* margin-bottom: 10px; */
 }
 
 @media only screen and (max-height: 780px) {
@@ -123,6 +131,7 @@
     justify-content: center;
     align-items: center;
     gap: 20px; /* Space between the logos */
+    flex-wrap: nowrap; /* Prevent wrapping of logos */
     margin-bottom: 20px; /* Space below the logos */
 }
 
@@ -131,14 +140,57 @@
     object-fit: contain; /* Ensures the image scales nicely */
 }
 
+.disclaimerContainer {
+    margin-top: 20px; /* Space above disclaimers */
+    padding: 20px 10px; /* Padding around disclaimers */
+    text-align: center; /* Center align all text in the disclaimers */
+}
+
 .disclaimer {
     text-align: center;
     font-size: 14px;
     color: #666; /* A neutral gray for the disclaimer text */
-    margin-top: 20px; /* Space above the disclaimer */
-    max-width: 900px; /* Ensure it's not too wide */
-    margin-left: auto;
-    margin-right: auto; /* Center the disclaimer text */
+    /* margin-top: 20px; Space above the disclaimer */
+    /* max-width: 900px; Ensure it's not too wide */
+    /* margin-left: auto; */
+    /* margin-right: auto; Center the disclaimer text */
     line-height: 1.6; /* Improves readability with better line spacing */
     padding-bottom: 20px; /* Adds spacing below the last disclaimer */
+    margin-top: 10px; /* Add space between disclaimers */
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 90%; /* Ensure disclaimers fit within the viewport */
+    word-wrap: break-word; /* Prevents long words from overflowing */
+}
+
+@media only screen and (max-width: 480px) {
+    .chatEmptyStateTitle {
+        font-size: 2rem; /* Further reduce font size for very small screens */
+    }
+
+    .chatEmptyStateSubtitle {
+        font-size: 1rem; /* Adjust subtitle font size */
+        margin-bottom: 15px; /* Slightly reduce bottom margin */
+    }
+
+    .logoImage {
+        max-width: 40px; /* Smaller logo size for tighter layouts */
+    }
+
+    .logoRow {
+        gap: 5px; /* Minimize spacing between logos */
+    }
+}
+
+@media only screen and (max-width: 480px) {
+    .disclaimer {
+        font-size: 12px; /* Slightly smaller font for compact screens */
+        margin-top: 8px; /* Reduce space between disclaimers */
+        line-height: 1.4; /* Compact line spacing for small screens */
+    }
+
+    .disclaimerContainer {
+        padding: 15px 5px; /* Adjust padding for smaller screens */
+        margin-top: 10px; /* Reduce the top margin */
+    }
 }
