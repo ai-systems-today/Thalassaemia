@@ -3,6 +3,7 @@
     display: flex;
     flex-direction: column;
     margin-top: 20px;
+    padding-bottom: 40px; /* Added padding to push content away from the bottom */
 }
 
 .chatRoot {
@@ -16,6 +17,7 @@
     flex-direction: column;
     align-items: center;
     width: 100%;
+    padding-bottom: 20px; /* Additional bottom padding for overall content */
 }
 
 .chatEmptyState {
@@ -133,8 +135,10 @@
     text-align: center;
     font-size: 14px;
     color: #666; /* A neutral gray for the disclaimer text */
-    margin-top: 10px; /* Space above the disclaimer */
+    margin-top: 20px; /* Space above the disclaimer */
     max-width: 900px; /* Ensure it's not too wide */
     margin-left: auto;
     margin-right: auto; /* Center the disclaimer text */
+    line-height: 1.6; /* Improves readability with better line spacing */
+    padding-bottom: 20px; /* Adds spacing below the last disclaimer */
 }
