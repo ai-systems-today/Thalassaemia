@@ -183,4 +183,20 @@
         padding: 15px 5px; /* Adjust padding for smaller screens */
         margin-top: 10px; /* Reduce the top margin */
     }
+
+    /* Answer Box */
+    .chatMessageGpt {
+        max-width: 100%; /* Ensure it does not go out of the screen limits */
+        word-wrap: break-word; /* Prevent text overflow */
+        padding: 10px; /* Optional: Add some padding for better appearance */
+        box-sizing: border-box; /* Include padding in width calculation */
+        margin: 10px auto; /* Center-align and provide margin */
+    }
+
+    .chatMessageStream {
+        padding-left: 10px; /* Reduce horizontal padding for smaller screens */
+        padding-right: 10px;
+        overflow-x: hidden; /* Prevent horizontal scrolling */
+    }
+
 }
