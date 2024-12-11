@@ -549,10 +549,10 @@ const Chat = () => {
                                 <img src={thaliaIcon} alt="Thalia Logo" className={styles.logoImage} />
                                 <img src={euIcon} alt="EU Cofounded Logo" className={styles.logoImage} />
                             </div>
-                            <div className={styles.disclaimer}>
+                            {/* <div className={styles.disclaimer}>
                                 <b>Disclaimer:</b> Funded by the European Union. However, the views and opinions expressed are those of the author(s) only and do not reflect
                                 those of the European Union or HaDEA. Neither the European Union nor the granting authority can be held responsible for them.
-                            </div>
+                            </div> */}
                             <h1 className={styles.chatEmptyStateTitle}>Let's Talk About Thalassaemia</h1>
                             <h2 className={styles.chatEmptyStateSubtitle}>Ask your question or try an example below</h2>
                             <ExampleList onExampleClicked={onExampleClicked} useGPT4V={useGPT4V} />
@@ -632,6 +632,17 @@ const Chat = () => {
                             showSpeechInput={showSpeechInput}
                         />
                     </div>
+                    
+                    {/* Combined Disclaimers */}
+                    <div className={styles.disclaimerContainer}>
+                        <div className={styles.disclaimer}>
+                            <b>Disclaimer:</b> Funded by the European Union. However, the views and opinions expressed are those of the author(s) only and do not reflect those of the European Union or HaDEA. Neither the European Union nor the granting authority can be held responsible for them.
+                        </div>
+                        <div className={styles.disclaimer}>
+                            This information has been obtained from TIF International Guidelines, which were developed by renowned international experts in the field of haemoglobinopathies. Please visit our website for bi-monthly updates on new advances and clinical trials.
+                        </div>
+                    </div>
+
                 </div>
 
                 {answers.length > 0 && activeAnalysisPanelTab && (
