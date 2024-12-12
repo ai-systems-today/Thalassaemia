@@ -64,11 +64,12 @@
 .chatMessageStream {
     flex-grow: 1;
     max-height: 1024px;
-    /* max-width: 1028px; */
+    max-width: 1028px;
     width: 100%;
     overflow-y: auto;
-    padding-left: 24px;
-    padding-right: 24px;
+    /* padding-left: 24px;
+    padding-right: 24px; */
+    padding: 10px 24px; /*Consolidate padding*/
     display: flex;
     flex-direction: column;
     box-sizing: border-box; /* Include padding in total width */
@@ -76,12 +77,14 @@
 
 .chatMessageGpt {
     margin-bottom: 20px;
-    max-width: 100%;
+    max-width: 1028px;
     display: flex;
     /* min-width: 500px; */
     word-wrap: break-word; /* Prevent content from overflowing */
+    overflow-wrap: break-word; /* Compatibility for modern browsers */
     box-sizing: border-box;
     padding: 10px; /* Optional: Add padding for better readability */
+    margin: 10px auto; /* Center-align the answer box */
 }
 
 .chatMessageGptMinWidth {
@@ -100,6 +103,7 @@
     width: 100%;
     max-width: 1028px;
     background: #f2f2f2;
+    box-sizing: border-box; /* Include padding in width calculation */
 }
 
 .chatAnalysisPanel {
