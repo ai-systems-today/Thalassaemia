@@ -64,20 +64,24 @@
 .chatMessageStream {
     flex-grow: 1;
     max-height: 1024px;
-    max-width: 1028px;
+    /* max-width: 1028px; */
     width: 100%;
     overflow-y: auto;
     padding-left: 24px;
     padding-right: 24px;
     display: flex;
     flex-direction: column;
+    box-sizing: border-box; /* Include padding in total width */
 }
 
 .chatMessageGpt {
     margin-bottom: 20px;
-    max-width: 80%;
+    max-width: 100%;
     display: flex;
-    min-width: 500px;
+    /* min-width: 500px; */
+    word-wrap: break-word; /* Prevent content from overflowing */
+    box-sizing: border-box;
+    padding: 10px; /* Optional: Add padding for better readability */
 }
 
 .chatMessageGptMinWidth {
@@ -186,16 +190,17 @@
 
     /* Answer Box */
     .chatMessageGpt {
-        max-width: 100%; /* Ensure it does not go out of the screen limits */
+        max-width: 90%; /* Ensure it does not go out of the screen limits */
         word-wrap: break-word; /* Prevent text overflow */
-        padding: 10px; /* Optional: Add some padding for better appearance */
+        overflow-wrap: break-word; /* Ensure compatibility with modern browsers */
+        padding: 8px; /* Optional: Add some padding for better appearance */
         box-sizing: border-box; /* Include padding in width calculation */
         margin: 10px auto; /* Center-align and provide margin */
     }
 
     .chatMessageStream {
-        padding-left: 10px; /* Reduce horizontal padding for smaller screens */
-        padding-right: 10px;
+        padding-left: 12px; /* Reduce horizontal padding for smaller screens */
+        padding-right: 12px;
         overflow-x: hidden; /* Prevent horizontal scrolling */
     }
 
