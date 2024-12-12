@@ -279,12 +279,12 @@
     }
 
     /* Hide star icon */
-    .ms-StackItem.css-120 svg {
+    .chatMessageGpt svg[data-icon-name="Answer logo"] {
         display: none !important;
     }
 
     /* Hide clipboard icon */
-    .ms-Button .ms-Button-icon {
+    .chatMessageGpt i[data-icon-name="ClipboardList"] {
         display: none !important;
     }
 
