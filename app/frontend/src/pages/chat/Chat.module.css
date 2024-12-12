@@ -208,4 +208,9 @@
         overflow-x: hidden; /* Prevent horizontal scrolling */
     }
 
+    /* Hide citations on mobile */
+    [class*="citation"] {
+        display: none !important;
+    }
+
 }
