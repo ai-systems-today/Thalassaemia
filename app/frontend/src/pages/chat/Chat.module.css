@@ -258,8 +258,8 @@
         display: none !important;
     }
 
-    sup {
-        display: none;
+    .chatMessageGpt sup {
+        display: none !important;
     }
 
     /* Header Mobile Adjustments */
@@ -276,6 +276,16 @@
     .chatMessageGpt h3 {
         font-size: 1.2rem; /* Smaller H3 for mobile */
         margin-bottom: 6px;
+    }
+
+    /* Hide star icon */
+    .ms-StackItem.css-120 svg {
+        display: none !important;
+    }
+
+    /* Hide clipboard icon */
+    .ms-Button .ms-Button-icon {
+        display: none !important;
     }
 
 }
