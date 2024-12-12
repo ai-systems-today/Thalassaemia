@@ -34,7 +34,7 @@
     font-size: 2.5rem; /* Adjust size for smaller screens */
     font-weight: 600;
     text-align: center; /* Center aligns the title */
-    margin: 10px auto; /* Space above and below the title */
+    margin: 5px auto; /* Space above and below the title */
     max-width: 90%; /* Prevents the title from being too wide */
     line-height: 1.2; /* Ensures spacing between lines is compact */
     /* margin-top: 0; */
@@ -45,7 +45,7 @@
     font-size: 1.2rem; /* Reduce font size for mobile */
     font-weight: 500;
     text-align: center; /* Center aligns the subtitle */
-    margin: 0 auto 20px auto; /* Space below the subtitle */
+    margin: 5px auto; /* Space below the subtitle */
     max-width: 80%; /* Prevents text from stretching too wide */
     /* margin-bottom: 10px; */
 }
@@ -85,7 +85,52 @@
     box-sizing: border-box;
     padding: 10px; /* Optional: Add padding for better readability */
     margin: 10px auto; /* Center-align the answer box */
+    background: #fff; /* Ensure a clean background */
+    border-radius: 5px; /* Optional: Rounded corners for a polished look */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Subtle shadow */
 }
+
+.chatMessageGpt h1 {
+    font-size: 1.8rem; /* Reduce header size */
+    font-weight: bold;
+    line-height: 1.4; /* Add more space between lines */
+    margin-bottom: 8px; /* Reduce space below */
+    margin-top: 12px; /* Space above headers */
+}
+
+.chatMessageGpt h2 {
+    font-size: 1.6rem; /* Smaller than H1 but still prominent */
+    font-weight: bold;
+    line-height: 1.3;
+    margin-bottom: 8px;
+    margin-top: 12px;
+}
+
+.chatMessageGpt h3 {
+    font-size: 1.4rem; /* Smaller headers */
+    font-weight: bold;
+    line-height: 1.3;
+    margin-bottom: 8px;
+    margin-top: 12px;
+}
+
+.chatMessageGpt p {
+    font-size: 1rem; /* Standardize paragraph text size */
+    line-height: 1.5; /* Improve readability */
+    margin-bottom: 10px; /* Reduce large spacing between paragraphs */
+}
+
+.chatMessageGpt ul {
+    margin-top: 10px; /* Space above lists */
+    margin-bottom: 10px; /* Space below lists */
+    padding-left: 20px; /* Indent list items */
+}
+
+.chatMessageGpt li {
+    margin-bottom: 5px; /* Reduce space between list items */
+    line-height: 1.4; /* Compact list item spacing */
+}
+
 
 .chatMessageGptMinWidth {
     max-width: 500px;
@@ -211,6 +256,26 @@
     /* Hide citations on mobile */
     [class*="citation"] {
         display: none !important;
+    }
+
+    sup {
+        display: none;
+    }
+
+    /* Header Mobile Adjustments */
+    .chatMessageGpt h1 {
+        font-size: 1.5rem; /* Smaller H1 for mobile */
+        margin-bottom: 6px;
+    }
+
+    .chatMessageGpt h2 {
+        font-size: 1.3rem; /* Smaller H2 for mobile */
+        margin-bottom: 6px;
+    }
+
+    .chatMessageGpt h3 {
+        font-size: 1.2rem; /* Smaller H3 for mobile */
+        margin-bottom: 6px;
     }
 
 }
