@@ -364,20 +364,32 @@ const Chat = () => {
         let answer: string = "";
         let askResponse: ChatAppResponse = {} as ChatAppResponse;
     
-        const updateState = (newContent: string) => {
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    answer += newContent;
-                    const latestResponse: ChatAppResponse = {
-                        ...askResponse,
-                        message: { content: answer, role: askResponse.message.role },
-                    };
-                    setStreamedAnswers([...answers, [question, latestResponse]]);
-                    resolve(null);
-                }, 33);
-            });
-        };
+        // const updateState = (newContent: string) => {
+        //     return new Promise((resolve) => {
+        //         setTimeout(() => {
+        //             answer += newContent;
+        //             const latestResponse: ChatAppResponse = {
+        //                 ...askResponse,
+        //                 message: { content: answer, role: askResponse.message.role },
+        //             };
+        //             setStreamedAnswers([...answers, [question, latestResponse]]);
+        //             resolve(null);
+        //         }, 33);
+        //     });
+        // };
     
+        // Updated to reduce unnecessary re-renders and provide smoother updates
+        const updateState = (newContent: string) => {
+            answer += newContent; // Append new content to the existing answer
+            const latestResponse: ChatAppResponse = {
+                ...askResponse,
+                message: { content: answer, role: askResponse.message.role },
+            };
+            setStreamedAnswers((prev) => [...prev.slice(0, -1), [question, latestResponse]]); // Efficiently update only the last item
+        };
+
+
+
         try {
             setIsStreaming(true);
             for await (const event of readNDJSONStream(responseBody)) {
@@ -415,8 +427,20 @@ const Chat = () => {
         setIsStreaming(false);
     };
 
-    useEffect(() => chatMessageStreamEnd.current?.scrollIntoView({ behavior: "smooth" }), [isLoading]);
-    useEffect(() => chatMessageStreamEnd.current?.scrollIntoView({ behavior: "auto" }), [streamedAnswers]);
+    // useEffect(() => chatMessageStreamEnd.current?.scrollIntoView({ behavior: "smooth" }), [isLoading]);
+    // useEffect(() => chatMessageStreamEnd.current?.scrollIntoView({ behavior: "auto" }), [streamedAnswers]);
+
+    useEffect(() => {
+        if (isStreaming || isLoading) {
+            chatMessageStreamEnd.current?.scrollIntoView({ behavior: "smooth" });
+        } else {
+            // Ensure no interruptions if scrolling is manually controlled
+            chatMessageStreamEnd.current?.scrollIntoView({ behavior: "auto" });
+        }
+    }, [isStreaming, isLoading, streamedAnswers]);
+    
+
+
     useEffect(() => {
         getConfig();
     }, []);
@@ -545,10 +569,10 @@ const Chat = () => {
                     {!lastQuestionRef.current ? (
                         <div className={styles.chatEmptyState}>
                             {/* <SparkleFilled fontSize={"120px"} primaryFill={"rgba(115, 118, 225, 1)"} aria-hidden="true" aria-label="Chat logo" />*/}
-                            <div className={styles.logoRow}>
+                            {/* <div className={styles.logoRow}>
                                 <img src={thaliaIcon} alt="Thalia Logo" className={styles.logoImage} />
                                 <img src={euIcon} alt="EU Cofounded Logo" className={styles.logoImage} />
-                            </div>
+                            </div> */}
                             {/* <div className={styles.disclaimer}>
                                 <b>Disclaimer:</b> Funded by the European Union. However, the views and opinions expressed are those of the author(s) only and do not reflect
                                 those of the European Union or HaDEA. Neither the European Union nor the granting authority can be held responsible for them.
@@ -633,14 +657,28 @@ const Chat = () => {
                         />
                     </div>
 
-                    {/* Combined Disclaimers */}
-                    <div className={styles.disclaimerContainer}>
-                        <div className={styles.disclaimer}>
-                            <b>Disclaimer:</b> Funded by the European Union. However, the views and opinions expressed are those of the author(s) only and do not reflect those of the European Union or HaDEA. Neither the European Union nor the granting authority can be held responsible for them.
-                        </div>
-                        <div className={styles.disclaimer}>
-                            This information has been obtained from TIF International Guidelines, which were developed by renowned international experts in the field of haemoglobinopathies. Please visit our <a href="https://thalassaemia.org.cy/haemoglobin-disorders/clinical-trial-updates/" target="_blank" rel="noopener noreferrer">website</a> for bi-monthly updates on new advances and clinical trials.
-                        </div>
+
+                    {/* Combined Logos and Disclaimers */}
+                    {!lastQuestionRef.current && (
+                        <>
+                            {/* Logos */}
+                            <div className={styles.logoRow}>
+                                <img src={thaliaIcon} alt="Thalia Logo" className={styles.logoImage} />
+                                <img src={euIcon} alt="EU Cofounded Logo" className={styles.logoImage} />
+                            </div>
+
+                            {/* Disclaimers */}
+                            <div className={styles.disclaimerContainer}>
+                                <div className={styles.disclaimer}>
+                                    <b>Disclaimer:</b> Funded by the European Union. However, the views and opinions expressed are those of the author(s) only and do not reflect those of the European Union or HaDEA. Neither the European Union nor the granting authority can be held responsible for them.
+                                </div>
+                                <div className={styles.disclaimer}>
+                                    This information has been obtained from TIF International Guidelines, which were developed by renowned international experts in the field of haemoglobinopathies. Please visit our <a href="https://thalassaemia.org.cy/haemoglobin-disorders/clinical-trial-updates/" target="_blank" rel="noopener noreferrer">website</a> for bi-monthly updates on new advances and clinical trials.
+                                </div>
+                            </div>
+                        </>
+                    )}
+
                     </div>
 
                 </div>
