@@ -938,7 +938,7 @@ const Chat = () => {
                     {useLogin && <TokenClaimsDisplay />}
                 </Panel>
             </div>
-        </div>
+        
     );
 };
 
