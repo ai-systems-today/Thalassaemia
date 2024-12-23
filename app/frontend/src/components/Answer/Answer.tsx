@@ -48,14 +48,6 @@ export const Answer = ({
                 <Stack horizontal horizontalAlign="space-between">
                     <AnswerIcon />
                     <div>
-                        {/*<IconButton
-                            style={{ color: "black" }}
-                            iconProps={{ iconName: "Lightbulb" }}
-                            title="Show thought process"
-                            ariaLabel="Show thought process"
-                            onClick={() => onThoughtProcessClicked()}
-                            disabled={!answer.context.thoughts?.length}
-                        />*/}
                         <IconButton
                             style={{ color: "black" }}
                             iconProps={{ iconName: "ClipboardList" }}
@@ -74,37 +66,22 @@ export const Answer = ({
                 <div className={styles.answerText} dangerouslySetInnerHTML={{ __html: sanitizedAnswerHtml }}></div>
             </Stack.Item>
 
-            {/* {!!parsedAnswer.citations.length && (
-                <Stack.Item>
-                    <Stack horizontal wrap tokens={{ childrenGap: 5 }}>
-                        <span className={styles.citationLearnMore}>Citations:</span>
-                        {parsedAnswer.citations.map((x, i) => {
-                            const path = getCitationFilePath(x);
-                            return (
-                                <a key={i} className={styles.citation} title={x} onClick={() => onCitationClicked(path)}>
-                                    {`${++i}. ${x}`}
-                                </a>
-                            );
-                        })}
-                    </Stack>
-                </Stack.Item>
-            )} */}
-
+            {/* Ensure References Section is Above Citations */}
             {!!parsedAnswer.citations.length && (
-                <Stack>
-                    {/* Add "References" title */}
+                <>
+                    {/* References Title */}
                     <Stack.Item>
                         <h3 className={styles.referencesTitle}>References</h3>
                     </Stack.Item>
 
-                    {/* Add explanatory note */}
+                    {/* Explanatory Note for References */}
                     <Stack.Item>
                         <p className={styles.referencesNote}>
                             Click on the Supporting content and Citation links below to access the relevant publication.
                         </p>
                     </Stack.Item>
 
-                    {/* Existing Citations block */}
+                    {/* Citations Block */}
                     <Stack.Item>
                         <Stack horizontal wrap tokens={{ childrenGap: 5 }}>
                             <span className={styles.citationLearnMore}>Citations:</span>
@@ -118,10 +95,10 @@ export const Answer = ({
                             })}
                         </Stack>
                     </Stack.Item>
-                </Stack>
+                </>
             )}
 
-
+            {/* Follow-up Questions Section */}
             {!!followupQuestions?.length && showFollowupQuestions && onFollowupQuestionClicked && (
                 <Stack.Item>
                     <Stack horizontal wrap className={`${!!parsedAnswer.citations.length ? styles.followupQuestionsList : ""}`} tokens={{ childrenGap: 6 }}>
