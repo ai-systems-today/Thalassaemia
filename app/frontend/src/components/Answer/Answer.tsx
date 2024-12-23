@@ -91,7 +91,7 @@ export const Answer = ({
             )} */}
 
             {!!parsedAnswer.citations.length && (
-                <>
+                <Stack>
                     {/* Add "References" title */}
                     <Stack.Item>
                         <h3 className={styles.referencesTitle}>References</h3>
@@ -118,8 +118,9 @@ export const Answer = ({
                             })}
                         </Stack>
                     </Stack.Item>
-                </>
+                </Stack>
             )}
+
 
             {!!followupQuestions?.length && showFollowupQuestions && onFollowupQuestionClicked && (
                 <Stack.Item>
