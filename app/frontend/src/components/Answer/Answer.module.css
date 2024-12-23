@@ -135,3 +135,14 @@ sup {
     content: "";
     animation: loading 1s infinite;
 }
+
+.referencesTitle {
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.referencesNote {
+    font-size: 0.85rem; /* Smaller text */
+    color: gray;
+    margin-bottom: 8px;
+}

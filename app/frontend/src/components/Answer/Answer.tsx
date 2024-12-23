@@ -74,7 +74,7 @@ export const Answer = ({
                 <div className={styles.answerText} dangerouslySetInnerHTML={{ __html: sanitizedAnswerHtml }}></div>
             </Stack.Item>
 
-            {!!parsedAnswer.citations.length && (
+            {/* {!!parsedAnswer.citations.length && (
                 <Stack.Item>
                     <Stack horizontal wrap tokens={{ childrenGap: 5 }}>
                         <span className={styles.citationLearnMore}>Citations:</span>
@@ -88,6 +88,37 @@ export const Answer = ({
                         })}
                     </Stack>
                 </Stack.Item>
+            )} */}
+
+            {!!parsedAnswer.citations.length && (
+                <>
+                    {/* Add "References" title */}
+                    <Stack.Item>
+                        <h3 className={styles.referencesTitle}>References</h3>
+                    </Stack.Item>
+
+                    {/* Add explanatory note */}
+                    <Stack.Item>
+                        <p className={styles.referencesNote}>
+                            Click on the Supporting content and Citation links below to access the relevant publication.
+                        </p>
+                    </Stack.Item>
+
+                    {/* Existing Citations block */}
+                    <Stack.Item>
+                        <Stack horizontal wrap tokens={{ childrenGap: 5 }}>
+                            <span className={styles.citationLearnMore}>Citations:</span>
+                            {parsedAnswer.citations.map((x, i) => {
+                                const path = getCitationFilePath(x);
+                                return (
+                                    <a key={i} className={styles.citation} title={x} onClick={() => onCitationClicked(path)}>
+                                        {`${++i}. ${x}`}
+                                    </a>
+                                );
+                            })}
+                        </Stack>
+                    </Stack.Item>
+                </>
             )}
 
             {!!followupQuestions?.length && showFollowupQuestions && onFollowupQuestionClicked && (
