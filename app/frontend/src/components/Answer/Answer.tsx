@@ -27,23 +27,23 @@ interface Props {
 // import { ChatAppResponse } from "../../api";
 
 // Define the Props type for ReferencesSection
-interface ReferencesSectionProps {
-    citations: string[]; // Citations should be an array of strings
-    onCitationClicked: (filePath: string) => void; // Callback function type
-}
+// interface ReferencesSectionProps {
+//     citations: string[]; // Citations should be an array of strings
+//     onCitationClicked: (filePath: string) => void; // Callback function type
+// }
 
-// References Section Component
-const ReferencesSection = ({ citations, onCitationClicked }: ReferencesSectionProps) => (
-    <div className={styles.referencesContainer}>
-        {/* References Title */}
-        <h3 className={styles.referencesTitle}>References</h3>
+// // References Section Component
+// const ReferencesSection = ({ citations, onCitationClicked }: ReferencesSectionProps) => (
+//     <div className={styles.referencesContainer}>
+//         {/* References Title */}
+//         <h3 className={styles.referencesTitle}>References</h3>
 
-        {/* Explanatory Note */}
-        <p className={styles.referencesNote}>
-            Click on the Supporting content and Citation links below to access the relevant publication.
-        </p>
-    </div>
-);
+//         {/* Explanatory Note */}
+//         <p className={styles.referencesNote}>
+//             Click on the Supporting content and Citation links below to access the relevant publication.
+//         </p>
+//     </div>
+// );
 
 export const Answer = ({
     answer,
@@ -96,10 +96,10 @@ export const Answer = ({
                 <div className={styles.answerText} dangerouslySetInnerHTML={{ __html: sanitizedAnswerHtml }}></div>
             </Stack.Item>
 
-            {/* Add the References Section Here */}
+            {/* Add the References Section Here
             {!!parsedAnswer.citations.length && (
                 <ReferencesSection citations={parsedAnswer.citations} onCitationClicked={onCitationClicked} />
-            )}
+            )} */}
 
 
             {!!parsedAnswer.citations.length && (
