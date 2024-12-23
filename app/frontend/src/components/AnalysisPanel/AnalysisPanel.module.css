@@ -62,3 +62,20 @@
     max-width: 100%;
     object-fit: contain;
 }
+
+.analysisPanelContainer {
+    padding: 16px;
+}
+
+.referencesTitle {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.referencesNote {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 16px;
+}
+

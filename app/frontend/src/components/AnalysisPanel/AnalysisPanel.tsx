@@ -71,6 +71,14 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, citationHeigh
     };
 
     return (
+        <div className={styles.analysisPanelContainer}>
+        {/* Add References Title */}
+        <h3 className={styles.referencesTitle}>References</h3>
+
+        {/* Add Note Below Title */}
+        <p className={styles.referencesNote}>
+            Click on the Supporting content and Citation links below to access the relevant publication.
+        </p>
         <Pivot
             className={className}
             selectedKey={activeTab}
@@ -98,5 +106,6 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, citationHeigh
                 {renderFileViewer()}
             </PivotItem>
         </Pivot>
+        </div>
     );
 };
