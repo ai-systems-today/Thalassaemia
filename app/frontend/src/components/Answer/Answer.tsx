@@ -23,6 +23,28 @@ interface Props {
     speechUrl: string | null;
 }
 
+// Import necessary types
+// import { ChatAppResponse } from "../../api";
+
+// Define the Props type for ReferencesSection
+interface ReferencesSectionProps {
+    citations: string[]; // Citations should be an array of strings
+    onCitationClicked: (filePath: string) => void; // Callback function type
+}
+
+// References Section Component
+const ReferencesSection = ({ citations, onCitationClicked }: ReferencesSectionProps) => (
+    <div className={styles.referencesContainer}>
+        {/* References Title */}
+        <h3 className={styles.referencesTitle}>References</h3>
+
+        {/* Explanatory Note */}
+        <p className={styles.referencesNote}>
+            Click on the Supporting content and Citation links below to access the relevant publication.
+        </p>
+    </div>
+);
+
 export const Answer = ({
     answer,
     isSelected,
@@ -48,6 +70,14 @@ export const Answer = ({
                 <Stack horizontal horizontalAlign="space-between">
                     <AnswerIcon />
                     <div>
+                        {/*<IconButton
+                            style={{ color: "black" }}
+                            iconProps={{ iconName: "Lightbulb" }}
+                            title="Show thought process"
+                            ariaLabel="Show thought process"
+                            onClick={() => onThoughtProcessClicked()}
+                            disabled={!answer.context.thoughts?.length}
+                        />*/}
                         <IconButton
                             style={{ color: "black" }}
                             iconProps={{ iconName: "ClipboardList" }}
@@ -66,39 +96,29 @@ export const Answer = ({
                 <div className={styles.answerText} dangerouslySetInnerHTML={{ __html: sanitizedAnswerHtml }}></div>
             </Stack.Item>
 
-            {/* Ensure References Section is Above Citations */}
+            {/* Add the References Section Here */}
             {!!parsedAnswer.citations.length && (
-                <>
-                    {/* References Title */}
-                    <Stack.Item>
-                        <h3 className={styles.referencesTitle}>References</h3>
-                    </Stack.Item>
-
-                    {/* Explanatory Note for References */}
-                    <Stack.Item>
-                        <p className={styles.referencesNote}>
-                            Click on the Supporting content and Citation links below to access the relevant publication.
-                        </p>
-                    </Stack.Item>
-
-                    {/* Citations Block */}
-                    <Stack.Item>
-                        <Stack horizontal wrap tokens={{ childrenGap: 5 }}>
-                            <span className={styles.citationLearnMore}>Citations:</span>
-                            {parsedAnswer.citations.map((x, i) => {
-                                const path = getCitationFilePath(x);
-                                return (
-                                    <a key={i} className={styles.citation} title={x} onClick={() => onCitationClicked(path)}>
-                                        {`${++i}. ${x}`}
-                                    </a>
-                                );
-                            })}
-                        </Stack>
-                    </Stack.Item>
-                </>
+                <ReferencesSection citations={parsedAnswer.citations} onCitationClicked={onCitationClicked} />
             )}
 
-            {/* Follow-up Questions Section */}
+
+            {!!parsedAnswer.citations.length && (
+                <Stack.Item>
+                    <Stack horizontal wrap tokens={{ childrenGap: 5 }}>
+                        <span className={styles.citationLearnMore}>Citations:</span>
+                        {parsedAnswer.citations.map((x, i) => {
+                            const path = getCitationFilePath(x);
+                            return (
+                                <a key={i} className={styles.citation} title={x} onClick={() => onCitationClicked(path)}>
+                                    {`${++i}. ${x}`}
+                                </a>
+                            );
+                        })}
+                    </Stack>
+                </Stack.Item>
+            )}
+
+
             {!!followupQuestions?.length && showFollowupQuestions && onFollowupQuestionClicked && (
                 <Stack.Item>
                     <Stack horizontal wrap className={`${!!parsedAnswer.citations.length ? styles.followupQuestionsList : ""}`} tokens={{ childrenGap: 6 }}>
