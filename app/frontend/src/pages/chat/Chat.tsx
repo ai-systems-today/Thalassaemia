@@ -657,6 +657,11 @@ const Chat = () => {
                         />
                     </div>
 
+                    {/* Disclaimer directly under the prompt input */}
+                    <div style={{ fontSize: "12px", color: "grey" }}>
+                        Knowledge bot can make mistakes. Please verify important information.
+                    </div>
+
 
                     {/* Combined Logos and Disclaimers */}
                     {!lastQuestionRef.current && (
@@ -673,7 +678,7 @@ const Chat = () => {
                                     <b>Disclaimer:</b> Funded by the European Union. However, the views and opinions expressed are those of the author(s) only and do not reflect those of the European Union or HaDEA. Neither the European Union nor the granting authority can be held responsible for them.
                                 </div>
                                 <div className={styles.disclaimer}>
-                                    This information has been obtained from TIF International Guidelines, which were developed by renowned international experts in the field of haemoglobinopathies. Please visit our <a href="https://thalassaemia.org.cy/haemoglobin-disorders/clinical-trial-updates/" target="_blank" rel="noopener noreferrer">website</a> for bi-monthly updates on new advances and clinical trials.
+                                    <b>This information has been obtained from TIF International Guidelines, which were developed by renowned international experts in the field of haemoglobinopathies. Please visit our <a href="https://thalassaemia.org.cy/haemoglobin-disorders/clinical-trial-updates/" target="_blank" rel="noopener noreferrer">website</a> for bi-monthly updates on new advances and clinical trials.</b>
                                 </div>
                             </div>
                         </>

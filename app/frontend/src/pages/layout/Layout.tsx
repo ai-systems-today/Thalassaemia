@@ -18,7 +18,7 @@ const Layout = () => {
                     <Link to="/" className={styles.headerTitleContainer}>
                         <h3 className={styles.headerTitle}>
                             <img src={tifDropIcon} alt="TIF Logo" className={styles.headerIcon}/>
-                        Thalassaemia International Federation</h3>
+                        TIF AI Knowledge Bot</h3>
                     </Link>
                     <nav>
                         <ul className={styles.headerNavList}>

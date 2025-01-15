@@ -64,6 +64,20 @@ export const Answer = ({
 
     const sanitizedAnswerHtml = DOMPurify.sanitize(parsedAnswer.answerHtml);
 
+    // Function to handle citation click and smooth scroll
+    const handleCitationClick = (filePath: string) => {
+        onCitationClicked(filePath);  // Keep the original click behavior
+
+        // Smooth scroll to bring the reference into view
+        setTimeout(() => {
+            window.scrollBy({
+                top: window.innerHeight / 2,  // Scrolls down half the page
+                behavior: "smooth"            // Smooth scrolling effect
+            });
+        }, 300);  // 300ms delay allows content to load before scrolling
+    };
+
+
     return (
         <Stack className={`${styles.answerContainer} ${isSelected && styles.selected}`} verticalAlign="space-between">
             <Stack.Item>
@@ -109,7 +123,8 @@ export const Answer = ({
                         {parsedAnswer.citations.map((x, i) => {
                             const path = getCitationFilePath(x);
                             return (
-                                <a key={i} className={styles.citation} title={x} onClick={() => onCitationClicked(path)}>
+                                // <a key={i} className={styles.citation} title={x} onClick={() => onCitationClicked(path)}>
+                                <a key={i} className={styles.citation} title={x} onClick={() => handleCitationClick(path)}>
                                     {`${++i}. ${x}`}
                                 </a>
                             );
