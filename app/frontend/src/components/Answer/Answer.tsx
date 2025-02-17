@@ -51,8 +51,11 @@ export const Answer = ({
     // Handle citation click (Different for mobile & desktop)
     const handleCitationClick = (filePath: string) => {
         if (isMobile) {
-            // Mobile: Open PDF in a new tab
-            window.open(filePath, "_blank", "noopener,noreferrer");
+            // Ensure URL is absolute
+            const absoluteFilePath = new URL(filePath, window.location.origin).href;
+
+            // Open PDF in a new tab (Fix mobile issue)
+            window.open(absoluteFilePath, "_blank", "noopener,noreferrer");
         } else {
             // Desktop: Open in a proper full-screen modal
             setPdfUrl(filePath);
@@ -117,14 +120,14 @@ export const Answer = ({
             <Modal
                 isOpen={isModalOpen}
                 onDismiss={() => setIsModalOpen(false)}
-                styles={{ main: { maxWidth: "90vw", height: "90vh" } }}
+                styles={{ main: { width: "90vw", height: "90vh" } }} // Fixing modal size issue
             >
-                <div style={{ width: "100%", height: "100%", overflow: "hidden" }}>
+                <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column" }}>
                     <iframe
                         src={pdfUrl}
                         width="100%"
                         height="100%"
-                        style={{ border: "none" }}
+                        style={{ flexGrow: 1, border: "none" }}
                         title="Citation PDF"
                     />
                 </div>
