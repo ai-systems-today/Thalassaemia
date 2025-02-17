@@ -44,16 +44,17 @@ export const Answer = ({
     // Detect if on Mobile
     const isMobile = window.innerWidth < 768;
 
-    // PDF Modal State
+    // PDF Modal State for Desktop
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [pdfUrl, setPdfUrl] = useState("");
 
-    // Handle citation click (different for mobile vs web)
+    // Handle citation click (Different for mobile & desktop)
     const handleCitationClick = (filePath: string) => {
         if (isMobile) {
-            // Open PDF in a new tab instead of trying to load it in a modal
-            window.open(filePath, "_blank");
+            // Mobile: Open PDF in a new tab
+            window.open(filePath, "_blank", "noopener,noreferrer");
         } else {
+            // Desktop: Open in a proper full-screen modal
             setPdfUrl(filePath);
             setIsModalOpen(true);
         }
@@ -112,10 +113,20 @@ export const Answer = ({
                 </Stack.Item>
             )}
 
-            {/* Desktop PDF Viewer Modal */}
-            <Modal isOpen={isModalOpen} onDismiss={() => setIsModalOpen(false)}>
-                <div className={styles.modalContent}>
-                    <iframe src={pdfUrl} width="100%" height="90vh" />
+            {/* Desktop PDF Viewer - Now Fullscreen & Properly Styled */}
+            <Modal
+                isOpen={isModalOpen}
+                onDismiss={() => setIsModalOpen(false)}
+                styles={{ main: { maxWidth: "90vw", height: "90vh" } }}
+            >
+                <div style={{ width: "100%", height: "100%", overflow: "hidden" }}>
+                    <iframe
+                        src={pdfUrl}
+                        width="100%"
+                        height="100%"
+                        style={{ border: "none" }}
+                        title="Citation PDF"
+                    />
                 </div>
             </Modal>
         </Stack>
