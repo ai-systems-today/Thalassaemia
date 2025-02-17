@@ -82,34 +82,32 @@ export const AnalysisPanel = ({
     // };
 
     const renderFileViewer = () => {
-    if (!activeCitation) {
-        return null;
-    }
-
-    const fileExtension = activeCitation.split(".").pop()?.toLowerCase();
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-    if (fileExtension === "pdf") {
-        if (isMobile) {
+        if (!activeCitation) {
+            return null;
+        }
+    
+        const fileExtension = activeCitation.split(".").pop()?.toLowerCase();
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+        if (fileExtension === "pdf") {
             return (
-                <div className={styles.pdfOptions}>
-                    <a href={citation} target="_blank" rel="noopener noreferrer" type="application/pdf" className={styles.mobilePdfLink}>
-                        Open PDF in a New Tab
-                    </a>
-                    <p className={styles.downloadNote}>If the PDF does not open, check your browser settings.</p>
-                </div>
+                <iframe 
+                    title="Citation PDF" 
+                    src={citation} 
+                    width="100%" 
+                    height={isMobile ? "500px" : citationHeight} 
+                    style={{ border: "none" }}
+                />
             );
+        } else if (fileExtension === "png") {
+            return <img src={citation} className={styles.citationImg} alt="Citation Image" />;
+        } else if (fileExtension === "md") {
+            return <MarkdownViewer src={activeCitation} />;
         } else {
             return <iframe title="Citation" src={citation} width="100%" height={citationHeight} />;
         }
-    } else if (fileExtension === "png") {
-        return <img src={citation} className={styles.citationImg} alt="Citation Image" />;
-    } else if (fileExtension === "md") {
-        return <MarkdownViewer src={activeCitation} />;
-    } else {
-        return <iframe title="Citation" src={citation} width="100%" height={citationHeight} />;
-    }
-};
+    };
+    
  
 
     return (
