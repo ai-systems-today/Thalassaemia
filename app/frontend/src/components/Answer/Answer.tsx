@@ -42,6 +42,18 @@ export const Answer = ({
 
     const sanitizedAnswerHtml = DOMPurify.sanitize(parsedAnswer.answerHtml);
 
+    // Function to handle citation click and smooth scroll
+    const handleCitationClick = (filePath: string) => {
+        onCitationClicked(filePath);
+
+        setTimeout(() => {
+            window.scrollBy({
+                top: window.innerHeight / 2,
+                behavior: "smooth"
+            });
+        }, 300);
+    };
+
     return (
         <Stack className={`${styles.answerContainer} ${isSelected && styles.selected}`} verticalAlign="space-between">
             <Stack.Item>
@@ -65,6 +77,36 @@ export const Answer = ({
             <Stack.Item grow>
                 <div className={styles.answerText} dangerouslySetInnerHTML={{ __html: sanitizedAnswerHtml }}></div>
             </Stack.Item>
+
+            {/* ✅ Restore Follow-Up Questions */}
+            {!!followupQuestions?.length && showFollowupQuestions && onFollowupQuestionClicked && (
+                <Stack.Item>
+                    <Stack horizontal wrap className={`${!!parsedAnswer.citations.length ? styles.followupQuestionsList : ""}`} tokens={{ childrenGap: 6 }}>
+                        <span className={styles.followupQuestionLearnMore}>Follow-up questions:</span>
+                        {followupQuestions.map((x, i) => (
+                            <a key={i} className={styles.followupQuestion} title={x} onClick={() => onFollowupQuestionClicked(x)}>
+                                {`${x}`}
+                            </a>
+                        ))}
+                    </Stack>
+                </Stack.Item>
+            )}
+
+            {!!parsedAnswer.citations.length && (
+                <Stack.Item>
+                    <Stack horizontal wrap tokens={{ childrenGap: 5 }}>
+                        <span className={styles.citationLearnMore}>Citations:</span>
+                        {parsedAnswer.citations.map((x, i) => {
+                            const path = getCitationFilePath(x);
+                            return (
+                                <a key={i} className={styles.citation} title={x} onClick={() => handleCitationClick(path)}>
+                                    {`${++i}. ${x}`}
+                                </a>
+                            );
+                        })}
+                    </Stack>
+                </Stack.Item>
+            )}
         </Stack>
     );
 };

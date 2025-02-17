@@ -1,11 +1,8 @@
 import { Stack, Pivot, PivotItem } from "@fluentui/react";
-
 import styles from "./AnalysisPanel.module.css";
-
 import { SupportingContent } from "../SupportingContent";
 import { ChatAppResponse } from "../../api";
 import { AnalysisPanelTabs } from "./AnalysisPanelTabs";
-// import { ThoughtProcess } from "./ThoughtProcess";
 import { MarkdownViewer } from "../MarkdownViewer";
 import { useMsal } from "@azure/msal-react";
 import { getHeaders } from "../../api";
@@ -23,8 +20,14 @@ interface Props {
 
 const pivotItemDisabledStyle = { disabled: true, style: { color: "grey" } };
 
-export const AnalysisPanel = ({ answer, activeTab, activeCitation, citationHeight, className, onActiveTabChanged }: Props) => {
-    const isDisabledThoughtProcessTab: boolean = !answer.context.thoughts;
+export const AnalysisPanel = ({ 
+    answer, 
+    activeTab, 
+    activeCitation, 
+    citationHeight, 
+    className, 
+    onActiveTabChanged 
+}: Props) => {
     const isDisabledSupportingContentTab: boolean = !answer.context.data_points;
     const isDisabledCitationTab: boolean = !activeCitation;
     const [citation, setCitation] = useState("");
@@ -34,8 +37,6 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, citationHeigh
     const fetchCitation = async () => {
         const token = client ? await getToken(client) : undefined;
         if (activeCitation) {
-            // Get hash from the URL as it may contain #page=N
-            // which helps browser PDF renderer jump to correct page N
             const originalHash = activeCitation.includes("#") ? activeCitation.split("#")[1] : "";
             const response = await fetch(activeCitation, {
                 method: "GET",
@@ -43,7 +44,6 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, citationHeigh
             });
             const citationContent = await response.blob();
             let citationObjectUrl = URL.createObjectURL(citationContent);
-            // Add hash back to the new blob URL
             if (originalHash) {
                 citationObjectUrl += "#" + originalHash;
             }
@@ -61,43 +61,29 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, citationHeigh
         }
 
         const fileExtension = activeCitation.split(".").pop()?.toLowerCase();
-
-        // Force inline PDF display on mobile and web
-        if (fileExtension === "pdf") {
-            return (
-                <iframe 
-                    title="Citation" 
-                    src={`${activeCitation}#view=FitH`} 
-                    width="100%" 
-                    height="600px"
-                    style={{ border: "none" }}
-                    allowFullScreen
-                />
-            );
-        }
-
         switch (fileExtension) {
             case "png":
-            case "jpg":
-            case "jpeg":
                 return <img src={citation} className={styles.citationImg} alt="Citation Image" />;
             case "md":
                 return <MarkdownViewer src={activeCitation} />;
-            default:
+            case "pdf":
                 return (
-                    <a href={activeCitation} target="_blank" rel="noopener noreferrer">
-                        Open File
-                    </a>
+                    <iframe 
+                        title="Citation" 
+                        src={`https://docs.google.com/gview?url=${citation}&embedded=true`} 
+                        width="100%" 
+                        height={citationHeight} 
+                        className={styles.pdfViewer} 
+                    />
                 );
+            default:
+                return <iframe title="Citation" src={citation} width="100%" height={citationHeight} />;
         }
     };
 
     return (
         <div className={styles.analysisPanelContainer}>
-            {/* Add References Title */}
             <h3 className={styles.referencesTitle}>References</h3>
-
-            {/* Add Note Below Title */}
             <p className={styles.referencesNote}>
                 Click on the Supporting content and Citation links below to access the relevant publication.
             </p>
