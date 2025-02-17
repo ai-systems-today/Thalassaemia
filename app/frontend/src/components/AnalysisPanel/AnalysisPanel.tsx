@@ -34,22 +34,37 @@ export const AnalysisPanel = ({
 
     const client = useLogin ? useMsal().instance : undefined;
 
+    // const fetchCitation = async () => {
+    //     const token = client ? await getToken(client) : undefined;
+    //     if (activeCitation) {
+    //         const originalHash = activeCitation.includes("#") ? activeCitation.split("#")[1] : "";
+    //         const response = await fetch(activeCitation, {
+    //             method: "GET",
+    //             headers: await getHeaders(token)
+    //         });
+    //         const citationContent = await response.blob();
+    //         let citationObjectUrl = URL.createObjectURL(citationContent);
+    //         if (originalHash) {
+    //             citationObjectUrl += "#" + originalHash;
+    //         }
+    //         setCitation(citationObjectUrl);
+    //     }
+    // };
+
     const fetchCitation = async () => {
         const token = client ? await getToken(client) : undefined;
         if (activeCitation) {
-            const originalHash = activeCitation.includes("#") ? activeCitation.split("#")[1] : "";
             const response = await fetch(activeCitation, {
                 method: "GET",
                 headers: await getHeaders(token)
             });
             const citationContent = await response.blob();
-            let citationObjectUrl = URL.createObjectURL(citationContent);
-            if (originalHash) {
-                citationObjectUrl += "#" + originalHash;
-            }
-            setCitation(citationObjectUrl);
+    
+            // Use direct citation URL instead of object URL
+            setCitation(activeCitation);
         }
     };
+    
 
     useEffect(() => {
         fetchCitation();
@@ -90,14 +105,12 @@ export const AnalysisPanel = ({
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     
         if (fileExtension === "pdf") {
-            return (
-                <iframe 
-                    title="Citation PDF" 
-                    src={citation} 
-                    width="100%" 
-                    height={isMobile ? "500px" : citationHeight} 
-                    style={{ border: "none" }}
-                />
+            return isMobile ? (
+                <a href={citation} target="_blank" rel="noopener noreferrer" className={styles.pdfLink}>
+                    Open PDF
+                </a>
+            ) : (
+                <iframe title="Citation PDF" src={citation} width="100%" height={citationHeight} style={{ border: "none" }} />
             );
         } else if (fileExtension === "png") {
             return <img src={citation} className={styles.citationImg} alt="Citation Image" />;
@@ -107,6 +120,7 @@ export const AnalysisPanel = ({
             return <iframe title="Citation" src={citation} width="100%" height={citationHeight} />;
         }
     };
+    
     
  
 
