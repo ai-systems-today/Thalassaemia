@@ -1,13 +1,14 @@
 import { Stack, Pivot, PivotItem } from "@fluentui/react";
-import { useState, useEffect } from "react";
 import styles from "./AnalysisPanel.module.css";
 import { SupportingContent } from "../SupportingContent";
 import { ChatAppResponse } from "../../api";
 import { AnalysisPanelTabs } from "./AnalysisPanelTabs";
+//import { ThoughtProcess } from "./ThoughtProcess";
 import { MarkdownViewer } from "../MarkdownViewer";
 import { useMsal } from "@azure/msal-react";
 import { getHeaders } from "../../api";
 import { useLogin, getToken } from "../../authConfig";
+import { useState, useEffect } from "react";
 
 interface Props {
     className: string;
@@ -27,25 +28,26 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, citationHeigh
 
     const client = useLogin ? useMsal().instance : undefined;
 
-    useEffect(() => {
+    const fetchCitation = async () => {
+        const token = client ? await getToken(client) : undefined;
         if (activeCitation) {
-            const fetchCitation = async () => {
-                const token = client ? await getToken(client) : undefined;
-                const response = await fetch(activeCitation, {
-                    method: "GET",
-                    headers: await getHeaders(token)
-                });
-                const citationContent = await response.blob();
-                let citationObjectUrl = URL.createObjectURL(citationContent);
-                setCitation(citationObjectUrl);
-            };
-            fetchCitation();
+            const response = await fetch(activeCitation, {
+                method: "GET",
+                headers: await getHeaders(token)
+            });
+            const citationContent = await response.blob();
+            let citationObjectUrl = URL.createObjectURL(citationContent);
+            setCitation(citationObjectUrl);
         }
+    };
+    useEffect(() => {
+        fetchCitation();
     }, [activeCitation]);
 
     const renderFileViewer = () => {
-        if (!activeCitation) return null;
-
+        if (!activeCitation) {
+            return null;
+        }
         const fileExtension = activeCitation.split(".").pop()?.toLowerCase();
         switch (fileExtension) {
             case "png":
@@ -53,19 +55,33 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, citationHeigh
             case "md":
                 return <MarkdownViewer src={activeCitation} />;
             default:
-                return <iframe title="Citation" src={citation} width="100%" style={{ maxHeight: "80vh", overflow: "auto" }} />;
+                return <iframe title="Citation" src={citation} width="100%" height="600px" style={{ border: "none" }} />;
         }
     };
 
     return (
         <div className={styles.analysisPanelContainer}>
             <h3 className={styles.referencesTitle}>References</h3>
-            <p className={styles.referencesNote}>Click on the Supporting content and Citation links below to access the relevant publication.</p>
-            <Pivot className={className} selectedKey={activeTab} onLinkClick={pivotItem => pivotItem && onActiveTabChanged(pivotItem.props.itemKey! as AnalysisPanelTabs)}>
-                <PivotItem itemKey={AnalysisPanelTabs.SupportingContentTab} headerText="Supporting content" headerButtonProps={isDisabledSupportingContentTab ? pivotItemDisabledStyle : undefined}>
+            <p className={styles.referencesNote}>
+                Click on the Supporting content and Citation links below to access the relevant publication.
+            </p>
+            <Pivot
+                className={className}
+                selectedKey={activeTab}
+                onLinkClick={pivotItem => pivotItem && onActiveTabChanged(pivotItem.props.itemKey! as AnalysisPanelTabs)}
+            >
+                <PivotItem
+                    itemKey={AnalysisPanelTabs.SupportingContentTab}
+                    headerText="Supporting content"
+                    headerButtonProps={isDisabledSupportingContentTab ? pivotItemDisabledStyle : undefined}
+                >
                     <SupportingContent supportingContent={answer.context.data_points} />
                 </PivotItem>
-                <PivotItem itemKey={AnalysisPanelTabs.CitationTab} headerText="Citation" headerButtonProps={isDisabledCitationTab ? pivotItemDisabledStyle : undefined}>
+                <PivotItem
+                    itemKey={AnalysisPanelTabs.CitationTab}
+                    headerText="Citation"
+                    headerButtonProps={isDisabledCitationTab ? pivotItemDisabledStyle : undefined}
+                >
                     {renderFileViewer()}
                 </PivotItem>
             </Pivot>
