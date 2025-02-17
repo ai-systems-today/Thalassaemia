@@ -51,12 +51,11 @@ export const Answer = ({
     // Handle citation click (different for mobile vs web)
     const handleCitationClick = (filePath: string) => {
         if (isMobile) {
-            // Mobile: Open PDF in modal
+            // Open PDF in a new tab instead of trying to load it in a modal
+            window.open(filePath, "_blank");
+        } else {
             setPdfUrl(filePath);
             setIsModalOpen(true);
-        } else {
-            // Web: Open citation normally
-            onCitationClicked(filePath);
         }
     };
 
@@ -113,7 +112,7 @@ export const Answer = ({
                 </Stack.Item>
             )}
 
-            {/* Mobile PDF Viewer Modal */}
+            {/* Desktop PDF Viewer Modal */}
             <Modal isOpen={isModalOpen} onDismiss={() => setIsModalOpen(false)}>
                 <div className={styles.modalContent}>
                     <iframe src={pdfUrl} width="100%" height="90vh" />
