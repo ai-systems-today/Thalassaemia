@@ -79,3 +79,31 @@
     margin-bottom: 16px;
 }
 
+.pdfOptions {
+    text-align: center;
+    margin: 10px 0;
+}
+
+.mobilePdfLink {
+    display: block;
+    background: #123bb6;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    text-decoration: none;
+    margin: 10px auto;
+    width: 80%;
+}
+
+.mobilePdfLink:hover {
+    background: #0d2a91;
+}
+
+.downloadNote {
+    font-size: 14px;
+    color: gray;
+    text-align: center;
+    margin-top: 5px;
+}

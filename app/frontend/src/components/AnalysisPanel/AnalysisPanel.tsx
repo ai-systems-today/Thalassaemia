@@ -55,31 +55,62 @@ export const AnalysisPanel = ({
         fetchCitation();
     }, [activeCitation]);
 
-    const renderFileViewer = () => {
-        if (!activeCitation) {
-            return null;
-        }
+    // const renderFileViewer = () => {
+    //     if (!activeCitation) {
+    //         return null;
+    //     }
 
-        const fileExtension = activeCitation.split(".").pop()?.toLowerCase();
-        switch (fileExtension) {
-            case "png":
-                return <img src={citation} className={styles.citationImg} alt="Citation Image" />;
-            case "md":
-                return <MarkdownViewer src={activeCitation} />;
-            case "pdf":
-                return (
-                    <iframe 
-                        title="Citation" 
-                        src={`https://docs.google.com/gview?url=${citation}&embedded=true`} 
-                        width="100%" 
-                        height={citationHeight} 
-                        className={styles.pdfViewer} 
-                    />
-                );
-            default:
-                return <iframe title="Citation" src={citation} width="100%" height={citationHeight} />;
+    //     const fileExtension = activeCitation.split(".").pop()?.toLowerCase();
+    //     switch (fileExtension) {
+    //         case "png":
+    //             return <img src={citation} className={styles.citationImg} alt="Citation Image" />;
+    //         case "md":
+    //             return <MarkdownViewer src={activeCitation} />;
+    //         case "pdf":
+    //             return (
+    //                 <iframe 
+    //                     title="Citation" 
+    //                     src={`https://docs.google.com/gview?url=${citation}&embedded=true`} 
+    //                     width="100%" 
+    //                     height={citationHeight} 
+    //                     className={styles.pdfViewer} 
+    //                 />
+    //             );
+    //         default:
+    //             return <iframe title="Citation" src={citation} width="100%" height={citationHeight} />;
+    //     }
+    // };
+
+    const renderFileViewer = () => {
+    if (!activeCitation) {
+        return null;
+    }
+
+    const fileExtension = activeCitation.split(".").pop()?.toLowerCase();
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    if (fileExtension === "pdf") {
+        if (isMobile) {
+            return (
+                <div className={styles.pdfOptions}>
+                    <a href={citation} target="_blank" rel="noopener noreferrer" type="application/pdf" className={styles.mobilePdfLink}>
+                        Open PDF in a New Tab
+                    </a>
+                    <p className={styles.downloadNote}>If the PDF does not open, check your browser settings.</p>
+                </div>
+            );
+        } else {
+            return <iframe title="Citation" src={citation} width="100%" height={citationHeight} />;
         }
-    };
+    } else if (fileExtension === "png") {
+        return <img src={citation} className={styles.citationImg} alt="Citation Image" />;
+    } else if (fileExtension === "md") {
+        return <MarkdownViewer src={activeCitation} />;
+    } else {
+        return <iframe title="Citation" src={citation} width="100%" height={citationHeight} />;
+    }
+};
+ 
 
     return (
         <div className={styles.analysisPanelContainer}>
