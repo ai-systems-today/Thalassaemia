@@ -8,7 +8,6 @@ import { parseAnswerToHtml } from "./AnswerParser";
 import { AnswerIcon } from "./AnswerIcon";
 import { SpeechOutputBrowser } from "./SpeechOutputBrowser";
 import { SpeechOutputAzure } from "./SpeechOutputAzure";
-import PDFViewer from "../PDFViewer/PDFViewer"; // ✅ Import PDF Viewer
 
 interface Props {
     answer: ChatAppResponse;
@@ -43,14 +42,36 @@ export const Answer = ({
 
     const sanitizedAnswerHtml = DOMPurify.sanitize(parsedAnswer.answerHtml);
 
+    // Function to handle citation click and smooth scroll
+    // const handleCitationClick = (filePath: string) => {
+    //     onCitationClicked(filePath);
+
+    //     setTimeout(() => {
+    //         window.scrollBy({
+    //             top: window.innerHeight / 2,
+    //             behavior: "smooth"
+    //         });
+    //     }, 300);
+    // };
+
     const handleCitationClick = (filePath: string) => {
-        const pageNumber = filePath.includes("#page=") ? filePath.split("#page=")[1] : "1";
+        // Extract page number if present
+        const pageNumber = filePath.includes("#page=") 
+            ? filePath.split("#page=")[1] 
+            : "1"; // Default to page 1
+    
         const formattedUrl = filePath.includes(".pdf") ? `${filePath}#page=${pageNumber}` : filePath;
+    
         onCitationClicked(formattedUrl);
+    
         setTimeout(() => {
-            window.scrollBy({ top: window.innerHeight / 2, behavior: "smooth" });
+            window.scrollBy({
+                top: window.innerHeight / 2,
+                behavior: "smooth"
+            });
         }, 300);
     };
+    
 
     return (
         <Stack className={`${styles.answerContainer} ${isSelected && styles.selected}`} verticalAlign="space-between">
@@ -76,13 +97,7 @@ export const Answer = ({
                 <div className={styles.answerText} dangerouslySetInnerHTML={{ __html: sanitizedAnswerHtml }}></div>
             </Stack.Item>
 
-            {/* ✅ PDF Handling - Display PDF Viewer if a PDF is detected */}
-            {parsedAnswer.citations.some(citation => citation.endsWith(".pdf")) && (
-                <Stack.Item>
-                    <PDFViewer pdfUrl={parsedAnswer.citations.find(citation => citation.endsWith(".pdf")) || ""} />
-                </Stack.Item>
-            )}
-
+            {/* ✅ Restore Follow-Up Questions */}
             {!!followupQuestions?.length && showFollowupQuestions && onFollowupQuestionClicked && (
                 <Stack.Item>
                     <Stack horizontal wrap className={`${!!parsedAnswer.citations.length ? styles.followupQuestionsList : ""}`} tokens={{ childrenGap: 6 }}>
@@ -114,4 +129,3 @@ export const Answer = ({
         </Stack>
     );
 };
-

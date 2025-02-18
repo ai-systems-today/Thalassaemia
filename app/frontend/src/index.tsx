@@ -1,3 +1,4 @@
+import PDFViewer from "./components/PDFViewer/PDFViewer";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { createHashRouter, RouterProvider } from "react-router-dom";
@@ -26,6 +27,10 @@ const router = createHashRouter([
             {
                 path: "qa",
                 lazy: () => import("./pages/ask/Ask")
+            },
+                        {
+                path: "pdf-viewer",  // ✅ Add this route
+                element: <PDFViewer />
             },
             {
                 path: "*",
