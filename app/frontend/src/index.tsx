@@ -18,7 +18,8 @@ initializeIcons();
 // ✅ **Define getPdfUrl() function**
 const getPdfUrl = () => {
     const params = new URLSearchParams(window.location.search);
-    return params.get("file") || "https://example.com/default.pdf"; // Default PDF if none provided
+    //return params.get("file") || "https://example.com/default.pdf"; // Default PDF if none provided
+    return params.get("file") || "https://stthalassaemia.blob.core.windows.net/content/sample.pdf";
 };
 
 const router = createHashRouter([
