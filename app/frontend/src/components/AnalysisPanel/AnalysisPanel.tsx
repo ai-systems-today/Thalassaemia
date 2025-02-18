@@ -96,6 +96,31 @@ export const AnalysisPanel = ({
     //     }
     // };
 
+    // const renderFileViewer = () => {
+    //     if (!activeCitation) {
+    //         return null;
+    //     }
+    
+    //     const fileExtension = activeCitation.split(".").pop()?.toLowerCase();
+    //     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+    //     if (fileExtension === "pdf") {
+    //         return isMobile ? (
+    //             <a href={citation} target="_blank" rel="noopener noreferrer" className={styles.pdfLink}>
+    //                 Open PDF
+    //             </a>
+    //         ) : (
+    //             <iframe title="Citation PDF" src={citation} width="100%" height={citationHeight} style={{ border: "none" }} />
+    //         );
+    //     } else if (fileExtension === "png") {
+    //         return <img src={citation} className={styles.citationImg} alt="Citation Image" />;
+    //     } else if (fileExtension === "md") {
+    //         return <MarkdownViewer src={activeCitation} />;
+    //     } else {
+    //         return <iframe title="Citation" src={citation} width="100%" height={citationHeight} />;
+    //     }
+    // };
+    
     const renderFileViewer = () => {
         if (!activeCitation) {
             return null;
@@ -105,12 +130,30 @@ export const AnalysisPanel = ({
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     
         if (fileExtension === "pdf") {
+            const pageNumber = activeCitation.includes("#page=") 
+                ? activeCitation.split("#page=")[1] 
+                : "1"; // Default to page 1 if no page is specified
+    
+            const pdfUrl = isMobile 
+                ? `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(activeCitation)}` 
+                : activeCitation;
+    
             return isMobile ? (
-                <a href={citation} target="_blank" rel="noopener noreferrer" className={styles.pdfLink}>
-                    Open PDF
-                </a>
+                <iframe 
+                    title="Citation PDF" 
+                    src={pdfUrl} 
+                    width="100%" 
+                    height={citationHeight} 
+                    style={{ border: "none" }} 
+                />
             ) : (
-                <iframe title="Citation PDF" src={citation} width="100%" height={citationHeight} style={{ border: "none" }} />
+                <iframe 
+                    title="Citation PDF" 
+                    src={activeCitation} 
+                    width="100%" 
+                    height={citationHeight} 
+                    style={{ border: "none" }} 
+                />
             );
         } else if (fileExtension === "png") {
             return <img src={citation} className={styles.citationImg} alt="Citation Image" />;
@@ -120,7 +163,6 @@ export const AnalysisPanel = ({
             return <iframe title="Citation" src={citation} width="100%" height={citationHeight} />;
         }
     };
-    
     
  
 

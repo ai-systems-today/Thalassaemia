@@ -43,9 +43,27 @@ export const Answer = ({
     const sanitizedAnswerHtml = DOMPurify.sanitize(parsedAnswer.answerHtml);
 
     // Function to handle citation click and smooth scroll
-    const handleCitationClick = (filePath: string) => {
-        onCitationClicked(filePath);
+    // const handleCitationClick = (filePath: string) => {
+    //     onCitationClicked(filePath);
 
+    //     setTimeout(() => {
+    //         window.scrollBy({
+    //             top: window.innerHeight / 2,
+    //             behavior: "smooth"
+    //         });
+    //     }, 300);
+    // };
+
+    const handleCitationClick = (filePath: string) => {
+        // Extract page number if present
+        const pageNumber = filePath.includes("#page=") 
+            ? filePath.split("#page=")[1] 
+            : "1"; // Default to page 1
+    
+        const formattedUrl = filePath.includes(".pdf") ? `${filePath}#page=${pageNumber}` : filePath;
+    
+        onCitationClicked(formattedUrl);
+    
         setTimeout(() => {
             window.scrollBy({
                 top: window.innerHeight / 2,
@@ -53,6 +71,7 @@ export const Answer = ({
             });
         }, 300);
     };
+    
 
     return (
         <Stack className={`${styles.answerContainer} ${isSelected && styles.selected}`} verticalAlign="space-between">
