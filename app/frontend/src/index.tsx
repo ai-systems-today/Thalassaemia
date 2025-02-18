@@ -15,6 +15,12 @@ import LayoutWrapper from "./layoutWrapper";
 
 initializeIcons();
 
+// ✅ **Define getPdfUrl() function**
+const getPdfUrl = () => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("file") || "https://example.com/default.pdf"; // Default PDF if none provided
+};
+
 const router = createHashRouter([
     {
         path: "/",
@@ -30,7 +36,7 @@ const router = createHashRouter([
             },
                         {
                 path: "pdf-viewer",  // ✅ Add this route
-                element: <PDFViewer />
+                element: <PDFViewer pdfUrl={getPdfUrl()} /> // ✅ Pass pdfUrl prop
             },
             {
                 path: "*",
