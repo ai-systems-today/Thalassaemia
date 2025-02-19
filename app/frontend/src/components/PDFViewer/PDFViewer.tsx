@@ -1,56 +1,96 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Document, Page } from "react-pdf";
-import * as pdfjs from "pdfjs-dist/build/pdf";
+import { pdfjs } from "react-pdf";
 import "pdfjs-dist/build/pdf.worker.entry";
 
-// Set up PDF.js worker
+// ✅ Fix PDF.js worker issue
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.10.111/pdf.worker.min.js`;
 
-// ✅ Define props for better TypeScript support
 interface PDFViewerProps {
-    pdfUrl: string; // Accept pdfUrl as a prop
+    pdfUrl: string;
 }
+
+// ✅ Detect Mobile Device
+const isMobile = () => /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
 
 const PDFViewer: React.FC<PDFViewerProps> = ({ pdfUrl }) => {
     const [numPages, setNumPages] = useState<number | null>(null);
     const [pageNumber, setPageNumber] = useState(1);
-    const [isMobile, setIsMobile] = useState(false);
-
-    // Detect Mobile View
-    useEffect(() => {
-        setIsMobile(window.innerWidth <= 768);
-    }, []);
+    const [scale, setScale] = useState(isMobile() ? 0.8 : 1.2);
+    const pdfWrapperRef = useRef<HTMLDivElement>(null);
 
     const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
         setNumPages(numPages);
     };
 
+    // ✅ Enable touch gestures for zooming
+    useEffect(() => {
+        const wrapper = pdfWrapperRef.current;
+        if (!wrapper || !isMobile()) return;
+
+        let scaleFactor = scale;
+        let startDist = 0;
+
+        const handleTouchStart = (e: TouchEvent) => {
+            if (e.touches.length === 2) {
+                startDist = Math.hypot(
+                    e.touches[0].pageX - e.touches[1].pageX,
+                    e.touches[0].pageY - e.touches[1].pageY
+                );
+            }
+        };
+
+        const handleTouchMove = (e: TouchEvent) => {
+            if (e.touches.length === 2) {
+                const newDist = Math.hypot(
+                    e.touches[0].pageX - e.touches[1].pageX,
+                    e.touches[0].pageY - e.touches[1].pageY
+                );
+                const delta = newDist - startDist;
+
+                if (Math.abs(delta) > 5) {
+                    scaleFactor += delta * 0.002; // Adjust zoom sensitivity
+                    scaleFactor = Math.max(0.6, Math.min(scaleFactor, 2)); // Clamp zoom
+                    setScale(scaleFactor);
+                }
+                startDist = newDist;
+            }
+        };
+
+        wrapper.addEventListener("touchstart", handleTouchStart);
+        wrapper.addEventListener("touchmove", handleTouchMove);
+
+        return () => {
+            wrapper.removeEventListener("touchstart", handleTouchStart);
+            wrapper.removeEventListener("touchmove", handleTouchMove);
+        };
+    }, []);
+
     return (
-        <div style={{ textAlign: "center", padding: "20px" }}>
-            {isMobile ? (
-                // 📌 Mobile: Open PDF in an external viewer
-                <div>
-                    <a href={pdfUrl} target="_blank" rel="noopener noreferrer">
-                        <button style={{ padding: "10px", fontSize: "16px" }}>Open PDF</button>
-                    </a>
-                </div>
-            ) : (
-                // 📌 Web: Embed the PDF Viewer
-                <>
-                    <Document file={pdfUrl} onLoadSuccess={onDocumentLoadSuccess}>
-                        <Page pageNumber={pageNumber} />
-                    </Document>
-                    <div>
-                        <button disabled={pageNumber <= 1} onClick={() => setPageNumber(pageNumber - 1)}>Previous</button>
-                        <span> Page {pageNumber} of {numPages} </span>
-                        <button disabled={pageNumber >= (numPages || 1)} onClick={() => setPageNumber(pageNumber + 1)}>Next</button>
-                    </div>
-                </>
-            )}
+        <div ref={pdfWrapperRef} style={{ textAlign: "center", padding: "10px", overflow: "hidden" }}>
+            <div style={{ overflowX: "scroll", maxWidth: "100%", maxHeight: "90vh" }}>
+                <Document file={pdfUrl} onLoadSuccess={onDocumentLoadSuccess}>
+                    <Page pageNumber={pageNumber} scale={scale} />
+                </Document>
+            </div>
+
+            {/* ✅ Zoom controls */}
+            <div style={{ marginTop: "10px" }}>
+                <button onClick={() => setScale(scale - 0.2)} disabled={scale <= 0.6}>➖ Zoom Out</button>
+                <button onClick={() => setScale(scale + 0.2)} disabled={scale >= 2}>➕ Zoom In</button>
+            </div>
+
+            {/* ✅ Page navigation */}
+            <div>
+                <button disabled={pageNumber <= 1} onClick={() => setPageNumber(pageNumber - 1)}>⬅ Previous</button>
+                <span> Page {pageNumber} of {numPages} </span>
+                <button disabled={pageNumber >= (numPages || 1)} onClick={() => setPageNumber(pageNumber + 1)}>➡ Next</button>
+            </div>
         </div>
     );
 };
 
 export default PDFViewer;
+
 
 
