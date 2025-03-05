@@ -24,6 +24,12 @@ interface Props {
     speechUrl: string | null;
 }
 
+function isPdfUrl(url: string): boolean {
+    // Check if the URL ends with .pdf or contains .pdf followed by query parameters
+    const pdfRegex = /\.pdf(?:#.*)?(?:\?.*)?$/i;
+    return pdfRegex.test(url);
+  }
+
 export const Answer = ({
     answer,
     isSelected,
@@ -45,7 +51,9 @@ export const Answer = ({
 
     const handleCitationClick = (filePath: string) => {
         const pageNumber = filePath.includes("#page=") ? filePath.split("#page=")[1] : "1";
-        const formattedUrl = filePath.includes(".pdf") ? `${filePath}#page=${pageNumber}` : filePath;
+        const formattedUrl = filePath.includes(".pdf") ?
+        filePath.includes("#page=") ? filePath : `${filePath}#page=${pageNumber}` : filePath; 
+        
         onCitationClicked(formattedUrl);
         setTimeout(() => {
             window.scrollBy({ top: window.innerHeight / 2, behavior: "smooth" });
@@ -76,12 +84,6 @@ export const Answer = ({
                 <div className={styles.answerText} dangerouslySetInnerHTML={{ __html: sanitizedAnswerHtml }}></div>
             </Stack.Item>
 
-            {/* ✅ PDF Handling - Display PDF Viewer if a PDF is detected */}
-            {parsedAnswer.citations.some(citation => citation.endsWith(".pdf")) && (
-                <Stack.Item>
-                    <PDFViewer pdfUrl={parsedAnswer.citations.find(citation => citation.endsWith(".pdf")) || ""} />
-                </Stack.Item>
-            )}
 
             {!!followupQuestions?.length && showFollowupQuestions && onFollowupQuestionClicked && (
                 <Stack.Item>

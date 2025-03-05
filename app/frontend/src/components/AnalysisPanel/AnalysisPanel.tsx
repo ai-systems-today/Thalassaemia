@@ -19,23 +19,48 @@ interface Props {
     answer: ChatAppResponse;
 }
 
-export const AnalysisPanel = ({ activeCitation, citationHeight }: Props) => {
-    const [citation, setCitation] = useState("");
+/**
+ * Detects if the current device is a mobile device based on user agent
+ * @returns boolean - true if the device is mobile, false otherwise
+ */
+function isMobileDevice(): boolean {
+  // Check if we're in a browser environment
+  if (typeof window === 'undefined' || !window.navigator) {
+    return false;
+  }
+  
+  const userAgent = window.navigator.userAgent || window.navigator.vendor || (window as any).opera;
+  
+  // Regular expression to match most mobile devices
+  const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+  
+  return mobileRegex.test(userAgent);
+}
 
-    useEffect(() => {
-        if (activeCitation) {
-            setCitation(activeCitation);
-        }
-    }, [activeCitation]);
+export default isMobileDevice;
 
+function isPdfUrl(url: string): boolean {
+    // Check if the URL ends with .pdf or contains .pdf followed by query parameters
+    const pdfRegex = /\.pdf(?:#.*)?(?:\?.*)?$/i;
+    return pdfRegex.test(url);
+  }
+
+
+  export const AnalysisPanel = ({ activeCitation, citationHeight }: Props) => {
+    if (!activeCitation) {
+       return null;
+    }
+
+    const isMobile = isMobileDevice();
+    const showPdf = isMobile && isPdfUrl(activeCitation);
     return (
         <div className={styles.analysisPanelContainer}>
             <h3 className={styles.referencesTitle}>References</h3>
 
-            {activeCitation?.endsWith(".pdf") ? (
+            {showPdf ? (
                 <PDFViewer pdfUrl={activeCitation || ""} />
             ) : (
-                <iframe title="Citation" src={citation} width="100%" height={citationHeight} style={{ border: "none" }} />
+                <iframe title="Citation" src={activeCitation || ""} width="100%" height={citationHeight} style={{ border: "none" }} />
             )}
         </div>
     );

@@ -1,68 +1,112 @@
+import { useState, useEffect } from 'react';
+import { Document, Page, pdfjs } from 'react-pdf';
+import 'react-pdf/dist/esm/Page/TextLayer.css';
+import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 
-import React, { useState, useEffect, useRef } from "react";
-import { Document, Page, pdfjs } from "react-pdf";
-import "pdfjs-dist/build/pdf.worker.entry";
+pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.8.69/pdf.worker.min.mjs`;
 
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.10.111/pdf.worker.min.js`;
-
-interface PDFViewerProps {
-    pdfUrl: string;
+interface PdfViewerProps {
+  pdfUrl: string;
+  initialPage?: number;
+  height?: string;
 }
 
-// ✅ Detect Mobile
-const isMobile = () => /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-const PDFViewer: React.FC<PDFViewerProps> = ({ pdfUrl }) => {
-    const [numPages, setNumPages] = useState<number | null>(null);
-    const [pageNumber, setPageNumber] = useState(1);
-    const [scale, setScale] = useState(isMobile() ? 0.8 : 1.2);
-    const pdfWrapperRef = useRef<HTMLDivElement>(null);
-
-    const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
-        setNumPages(numPages);
+const PdfViewer = ({ pdfUrl, initialPage = 1, height = 'auto' }: PdfViewerProps) => {
+  // Extract base URL and page number from the pdfUrl
+  const [baseUrl, setBaseUrl] = useState<string>('');
+  const [numPages, setNumPages] = useState<number | null>(null);
+  const [pageNumber, setPageNumber] = useState<number>(initialPage);
+  const [width, setWidth] = useState(window.innerWidth * 0.95);
+  
+  // Parse the PDF URL to extract page number when component mounts
+  useEffect(() => {
+    const parseUrl = () => {
+      // Check if URL has a #page= parameter
+      const hashPageMatch = pdfUrl.match(/#page=(\d+)/);
+      
+      if (hashPageMatch && hashPageMatch[1]) {
+        // Parse the page number
+        const pageFromUrl = parseInt(hashPageMatch[1], 10);
+        setPageNumber(pageFromUrl);
+        
+        // Get the base URL by removing the #page part
+        const baseUrlPart = pdfUrl.split('#')[0];
+        setBaseUrl(baseUrlPart);
+      } else {
+        // No page specified in URL
+        setPageNumber(initialPage);
+        setBaseUrl(pdfUrl);
+      }
     };
+    
+    parseUrl();
+  }, [pdfUrl, initialPage]);
+  
+  // Responsive width adjustment
+  useEffect(() => {
+    const handleResize = () => {
+      setWidth(window.innerWidth > 768 
+        ? window.innerWidth * 0.8
+        : window.innerWidth * 0.95);
+    };
+    
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
-    // ✅ Fix: Explicitly force mobile browsers to use iframe
-    if (isMobile()) {
-        return (
-            <div style={{ textAlign: "center", padding: "10px" }}>
-                <iframe
-                    src={pdfUrl}
-                    width="100%"
-                    height="600px"
-                    style={{ border: "none" }}
-                />
-                <p>
-                    If the PDF does not load,{" "}
-                    <a href={pdfUrl} target="_blank" rel="noopener noreferrer">
-                        click here to open it in a new tab.
-                    </a>
-                </p>
-            </div>
-        );
-    }
+  function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
+    setNumPages(numPages);
+  }
 
-    return (
-        <div ref={pdfWrapperRef} style={{ textAlign: "center", padding: "10px", overflow: "hidden" }}>
-            <div style={{ overflowX: "scroll", maxWidth: "100%", maxHeight: "90vh" }}>
-                <Document file={pdfUrl} onLoadSuccess={onDocumentLoadSuccess}>
-                    <Page pageNumber={pageNumber} scale={scale} />
-                </Document>
-            </div>
-
-            <div style={{ marginTop: "10px" }}>
-                <button onClick={() => setScale(scale - 0.2)} disabled={scale <= 0.6}>➖ Zoom Out</button>
-                <button onClick={() => setScale(scale + 0.2)} disabled={scale >= 2}>➕ Zoom In</button>
-            </div>
-
-            <div>
-                <button disabled={pageNumber <= 1} onClick={() => setPageNumber(pageNumber - 1)}>⬅ Previous</button>
-                <span> Page {pageNumber} of {numPages} </span>
-                <button disabled={pageNumber >= (numPages || 1)} onClick={() => setPageNumber(pageNumber + 1)}>➡ Next</button>
-            </div>
-        </div>
-    );
+  return (
+    <div className="pdf-container" style={{ height }}>
+      <Document
+        file={baseUrl}
+        onLoadSuccess={onDocumentLoadSuccess}
+        loading={<div className="loading">Loading PDF...</div>}
+        error={<div className="error">Failed to load PDF. Please try again later.</div>}
+      >
+        <Page 
+          pageNumber={pageNumber} 
+          width={width}
+          renderTextLayer={false}
+        />
+      </Document>
+      
+      {/* Mobile-friendly navigation controls */}
+      <div className="controls" style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between',
+        padding: '10px',
+        background: '#f0f0f0',
+        position: 'sticky',
+        bottom: 0
+      }}>
+        <button
+          disabled={pageNumber <= 1}
+          onClick={() => setPageNumber(prev => prev - 1)}
+          style={{ padding: '8px 16px', fontSize: '16px' }}
+        >
+          Previous
+        </button>
+        
+        <span style={{ display: 'flex', alignItems: 'center' }}>
+          Page {pageNumber} of {numPages || '--'}
+        </span>
+        
+        <button
+          disabled={numPages === null || pageNumber >= numPages}
+          onClick={() => setPageNumber(prev => prev + 1)}
+          style={{ padding: '8px 16px', fontSize: '16px' }}
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  );
 };
 
-export default PDFViewer;
+export default PdfViewer;
+
 
