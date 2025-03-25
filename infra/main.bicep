@@ -261,7 +261,7 @@ module appServicePlan 'core/host/appserviceplan.bicep' = {
     tags: tags
     sku: {
       name: appServiceSkuName
-      capacity: 1
+      capacity: 2
     }
     kind: 'linux'
   }
