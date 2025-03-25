@@ -11,15 +11,15 @@ from typing import Any, AsyncGenerator, Dict, Union, cast
 
 from dotenv import load_dotenv
 
-# load_dotenv()
+load_dotenv()
 
-# # Access environment variables
-# AZURE_STORAGE_ACCOUNT = os.getenv("AZURE_STORAGE_ACCOUNT")
-# AZURE_STORAGE_CHATLOGS = os.getenv("AZURE_STORAGE_CHATLOGS")
+# Access environment variables
+AZURE_STORAGE_ACCOUNT = os.getenv("AZURE_STORAGE_ACCOUNT")
+AZURE_STORAGE_CHATLOGS = os.getenv("AZURE_STORAGE_CHATLOGS")
 
-# # Log the loaded variables for debugging
-# logging.info(f"Storage account: {AZURE_STORAGE_ACCOUNT}")
-# logging.info(f"Chatlogs container: {AZURE_STORAGE_CHATLOGS}")
+# Log the loaded variables for debugging
+logging.info(f"Storage account: {AZURE_STORAGE_ACCOUNT}")
+logging.info(f"Chatlogs container: {AZURE_STORAGE_CHATLOGS}")
 
 from azure.cognitiveservices.speech import (
     ResultReason,
