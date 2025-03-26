@@ -1,4 +1,4 @@
-name: Deploy to staging
+name: Deploy
 
 on:
   workflow_dispatch:
@@ -128,8 +128,12 @@ jobs:
         env:
           AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Deploy Application
-        run: azd deploy --no-prompt
+      - name: Provision Infrastructure
+        run: azd provision --no-prompt
         env:
           AZURE_SERVER_APP_SECRET: ${{ secrets.AZURE_SERVER_APP_SECRET }}
           AZURE_CLIENT_APP_SECRET: ${{ secrets.AZURE_CLIENT_APP_SECRET }}
+
+      - name: Deploy Application
+        run: azd deploy --no-prompt
+
