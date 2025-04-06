@@ -30,7 +30,7 @@ from azure.cognitiveservices.speech import (
 )
 from azure.core.exceptions import ResourceNotFoundError
 from azure.identity.aio import DefaultAzureCredential, get_bearer_token_provider
-from azure.monitor.opentelemetry import configure_azure_monitor
+#from azure.monitor.opentelemetry import configure_azure_monitor
 from azure.search.documents.aio import SearchClient
 from azure.search.documents.indexes.aio import SearchIndexClient
 from azure.storage.blob.aio import ContainerClient
@@ -38,12 +38,12 @@ from azure.storage.blob.aio import StorageStreamDownloader as BlobDownloader
 from azure.storage.filedatalake.aio import FileSystemClient
 from azure.storage.filedatalake.aio import StorageStreamDownloader as DatalakeDownloader
 from openai import AsyncAzureOpenAI, AsyncOpenAI
-from opentelemetry.instrumentation.aiohttp_client import AioHttpClientInstrumentor
-from opentelemetry.instrumentation.asgi import OpenTelemetryMiddleware
-from opentelemetry.instrumentation.httpx import (
-    HTTPXClientInstrumentor,
-)
-from opentelemetry.instrumentation.openai import OpenAIInstrumentor
+#from opentelemetry.instrumentation.aiohttp_client import AioHttpClientInstrumentor
+#from opentelemetry.instrumentation.asgi import OpenTelemetryMiddleware
+#from opentelemetry.instrumentation.httpx import (
+#    HTTPXClientInstrumentor,
+#)
+#from opentelemetry.instrumentation.openai import OpenAIInstrumentor
 from quart import (
     Blueprint,
     Quart,
@@ -917,16 +917,16 @@ def create_app():
     app.register_blueprint(bp)
 
     # Azure Monitor and telemetry setup
-    if os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING"):
-        configure_azure_monitor()
-        # This tracks HTTP requests made by aiohttp:
-        AioHttpClientInstrumentor().instrument()
-        # This tracks HTTP requests made by httpx:
-        HTTPXClientInstrumentor().instrument()
-        # This tracks OpenAI SDK requests:
-        OpenAIInstrumentor().instrument()
-        # This middleware tracks app route requests:
-        app.asgi_app = OpenTelemetryMiddleware(app.asgi_app)  # type: ignore[assignment]
+    # if os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING"):
+    #     configure_azure_monitor()
+    #     # This tracks HTTP requests made by aiohttp:
+    #     AioHttpClientInstrumentor().instrument()
+    #     # This tracks HTTP requests made by httpx:
+    #     HTTPXClientInstrumentor().instrument()
+    #     # This tracks OpenAI SDK requests:
+    #     OpenAIInstrumentor().instrument()
+    #     # This middleware tracks app route requests:
+    #     app.asgi_app = OpenTelemetryMiddleware(app.asgi_app)  # type: ignore[assignment]
 
     # Logging setup
     default_level = "INFO"  # Default logging level for development
