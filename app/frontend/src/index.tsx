@@ -1,3 +1,20 @@
+// Safari/WebKit fallback for unsupported Promise.withResolvers (iOS 17.2+)
+if (typeof Promise.withResolvers !== 'function') {
+  Promise.withResolvers = function <T = unknown>(): PromiseWithResolvers<T> {
+    let resolve!: (value: T | PromiseLike<T>) => void;
+    let reject!: (reason?: any) => void;
+
+    const promise = new Promise<T>((res, rej) => {
+      resolve = res;
+      reject = rej;
+    });
+
+    return { promise, resolve, reject };
+  };
+}
+// This is a workaround for the issue with Safari 17.0+ where Promise.withResolvers is not available.
+
+
 import PDFViewer from "./components/PDFViewer/PDFViewer";
 import React from "react";
 import ReactDOM from "react-dom/client";
