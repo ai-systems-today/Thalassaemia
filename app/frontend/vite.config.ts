@@ -8,6 +8,7 @@ dotenv.config();
 // https://vitejs.dev/config/
 export default defineConfig({
     plugins: [react()],
+    assetsInclude: ["**/*.worker.js"],
     build: {
         outDir: "../backend/static",
         emptyOutDir: true,
@@ -40,7 +41,7 @@ export default defineConfig({
             "/delete_uploaded": "http://localhost:50505",
             "/list_uploaded": "http://localhost:50505",
             "/save-chat": "https://app-backend-tfkx7gjbumrtq.azurewebsites.net", //"http://localhost:50505", // Proxy for saving chats
-            "/chatlogs/": "http://localhost:50505"  // Proxy for fetching saved chats
+            "/chatlogs/": "http://localhost:50505" // Proxy for fetching saved chats
         }
     }
 });
